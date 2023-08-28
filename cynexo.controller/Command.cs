@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Cynexo.Controller;
 
+/// <summary>
+/// Generates commands to be sent to the device
+/// </summary>
 public static class Command
 {
     #region General
@@ -71,16 +74,28 @@ public static class Command
         return "setFlow " + string.Join(';', result);
     }
 
+    /// <summary>
+    /// Manually calibrates the flow of the selected olfactometer channel.
+    /// It is basically a continuous loop of the readFlow command.
+    /// </summary>
+    /// <param name="channel">channel ID</param>
+    /// <returns>String to send to the port</returns>
+    public static string ManualFlow(int channel) => $"manualFlow {channel}";
 
     /// <summary>
     /// Interrupts the calibration process if needed
     /// </summary>
     /// <returns>String to send to the port</returns>
-    public static string StopCalibration() => "stopCalibration";
+    public static string StopCalibration => "stopCalibration";
 
-    // Skipping:
-    //  ManualFlow
-    //  TestDelay
+    /// <summary>
+    /// Measures the delay between opening of the fast-acting solenoid valve and detection of the 
+    /// pressure front after the subject manifold(requires nasal adapters to be plugged
+    /// into calibration ports of the device).
+    /// </summary>
+    /// <param name="channel">channel ID</param>
+    /// <returns>String to send to the port</returns>
+    public static string TestDelay(int channel) => $"testDelay {channel}";
 
     #endregion
 
@@ -180,7 +195,48 @@ public static class Command
 
     #endregion
 
-    #region Triggered channel operation
+    #region Triggers
+
+    /// <summary>
+    /// Set the delay in milliseconds between the valve event and the subsequent generation of the trigger OUT.
+    /// </summary>
+    /// <param name="delay">milliseconds</param>
+    /// <returns>String to send to the port</returns>
+    public static string SetTriggerOutDelay(int delay) => $"setTriggerOutDelay {delay}";
+
+    /// <summary>
+    /// Set the duration of the trigger OUT signal.
+    /// </summary>
+    /// <param name="duration">milliseconds</param>
+    /// <returns>String to send to the port</returns>
+    public static string SetTriggerOutDuration(int duration) => $"setTriggerOutDuration {duration}";
+
+    /// <summary>
+    /// Checks that the Sniff-0 trigger OUT port is functioning correctly.
+    /// </summary>
+    /// <returns>String to send to the port</returns>
+    public static string OutTrigger => $"outTrigger";
+
+    /// <summary>
+    /// Checks that the Sniff-0 trigger IN port is functioning correctly by waiting for a trigger IN signal for 10 seconds
+    /// from when the command is executed. Should it not receive this signal with 10 seconds Sniff-0 will display
+    /// a time out message.
+    /// </summary>
+    /// <returns>String to send to the port</returns>
+    public static string InTrigger => $"inTrigger";
+
+    /// <summary>
+    /// Test for the correct functioning of the Sniff-0 trigger OUT and trigger IN by sending a trigger signal
+    /// out one port and reading it back in through the other port.
+    /// IMPORTANT! For the correct execution of the command, please connect the trigger IN connector with the 
+    /// trigger OUT connector via a standard BNC male to male cable.
+    /// </summary>
+    /// <returns>String to send to the port</returns>
+    public static string LoopTrigger => $"loopTrigger";
+
+    #endregion
+
+    #region Commands to be used with Spir-0
 
     /// <summary>
     /// Waits for the trigger IN from Spir-0, indicating that the subject has started **exhaling**,
@@ -190,13 +246,10 @@ public static class Command
     /// <param name="channel">channel ID</param>
     /// <param name="duration">in milliseconds</param>
     /// <param name="delay">sound delay, in milliseconds</param>
-    /// <param name="useSecondTrigger">if set, generatesa second trigger indicating the actual start of the sound</param>
+    /// <param name="useSecondTrigger">if set, generates second trigger indicating the actual start of the sound</param>
     /// <returns>String to send to the port</returns>
-    public static string OpenValveOnInhale(int channel, int duration, int delay, bool useSecondTrigger = false)
-    {
-        var secondTriggerCmd = useSecondTrigger ? "ta_" : "";
-        return $"Tb_{secondTriggerCmd}in_breathSound {channel} {duration} {delay}";
-    }
+    public static string OpenValveOnInhale(int channel, int duration, int delay, bool useSecondTrigger = false) =>
+        $"Tb_{GetSecondTriggerCmd(useSecondTrigger)}in_breathSound {channel} {duration} {delay}";
 
     /// <summary>
     /// Waits for the trigger IN from Spir-0, indicating that the subject has started **inhaling**,
@@ -206,23 +259,35 @@ public static class Command
     /// <param name="channel">channel ID</param>
     /// <param name="duration">in milliseconds</param>
     /// <param name="delay">sound delay, in milliseconds</param>
+    /// <param name="useSecondTrigger">if set, generates second trigger indicating the actual start of the sound</param>
     /// <returns>String to send to the port</returns>
-    public static string OpenValveOnExhale(int channel, int duration, int delay, bool useSecondTrigger = false)
-    {
-        var secondTriggerCmd = useSecondTrigger ? "ta_" : "";
-        return $"Tb_{secondTriggerCmd}out_breathSound {channel} {duration} {delay}";
-    }
+    public static string OpenValveOnExhale(int channel, int duration, int delay, bool useSecondTrigger = false) =>
+        $"Tb_{GetSecondTriggerCmd(useSecondTrigger)}out_breathSound {channel} {duration} {delay}";
 
-    // Skipping:
-    //  SetTriggerOutDuration
-    //  SetTriggerOutDelay
-    //  OutTrigger
-    //  InTrigger
-    //  LoopTrigger
+    /// <summary>
+    /// Generates a trigger OUT for the Spir-0 audio module to generate the sound and then opens the valve
+    /// of the selected channel after delay for the selected amount of time.
+    /// </summary>
+    /// <param name="channel">channel ID</param>
+    /// <param name="duration">in milliseconds</param>
+    /// <param name="delay">sound delay, in milliseconds</param>
+    /// <param name="useSecondTrigger">if set, generates second trigger indicating the actual start of the sound</param>
+    /// <returns>String to send to the port</returns>
+    public static string OpenValveAfterSound(int channel, int duration, int delay, bool useSecondTrigger = false) =>
+        $"Tb_{GetSecondTriggerCmd(useSecondTrigger)}soundValve {channel} {duration} {delay}";
 
-    // Skipping:
-    //  Tb_{ta_}soundValve
-    //  Tb_{ta_}valveSound
+    /// <summary>
+    /// Opens the valve of the selected channel for the selected amount of time and generates a trigger OUT 
+    /// for the Spir-0 audio module to generate the sound based on selected delay.
+    /// </summary>
+    /// <param name="channel">channel ID</param>
+    /// <param name="duration">in milliseconds</param>
+    /// <param name="delay">sound delay, in milliseconds</param>
+    /// <param name="useSecondTrigger">if set, generates second trigger indicating the actual start of the sound</param>
+    /// <returns>String to send to the port</returns>
+    public static string OpenValveThenSound(int channel, int duration, int delay, bool useSecondTrigger = false) =>
+        $"Tb_{GetSecondTriggerCmd(useSecondTrigger)}valveSound {channel} {duration} {delay}";
+
     #endregion
 
 
@@ -230,4 +295,6 @@ public static class Command
 
     const int MIN_CHANNEL_ID = 1;
     const int MAX_CHANNEL_ID = 13;
+
+    private static string GetSecondTriggerCmd(bool useSecondTrigger) => useSecondTrigger ? "ta_" : "";
 }
