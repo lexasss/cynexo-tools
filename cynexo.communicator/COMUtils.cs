@@ -5,7 +5,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Management;
 
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// COM port utils: list of available ports, and firing events when this list changes.

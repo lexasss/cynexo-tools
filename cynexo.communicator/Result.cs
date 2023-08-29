@@ -1,4 +1,4 @@
-﻿namespace Cynexo.Controller;
+﻿namespace Cynexo.Communicator;
 
 /// <summary>
 /// A subset of Windows ERROR_XXX codes that are used to return from <see cref="CommPort"/> methods

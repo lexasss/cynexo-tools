@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// Generates commands to be sent to the device
@@ -117,6 +117,12 @@ public static class Command
     }
 
     /// <summary>
+    /// Read the value of the air flow rate for the currently active channel
+    /// </summary>
+    /// <returns>String to send to the port</returns>
+    public static string ReadFlow => "readFlow";
+
+    /// <summary>
     /// Set the state of the valve of the active channel
     /// </summary>
     /// <param name="isOpened">Flag</param>
@@ -127,12 +133,6 @@ public static class Command
         var numValue = isOpened ? 1 : 0;
         return $"set{triggerCmd}Valve {numValue}";
     }
-
-    /// <summary>
-    /// Read the value of the air flow rate for the currently active channel
-    /// </summary>
-    /// <returns>String to send to the port</returns>
-    public static string ReadFlow() => "readFlow";
 
     /// <summary>
     /// Set the direction of the stepper valve motor

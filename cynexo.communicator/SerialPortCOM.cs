@@ -1,6 +1,6 @@
 ﻿using System.IO.Ports;
 
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// This class only translates all method calls to an instance of <see cref="SerialPort"/>

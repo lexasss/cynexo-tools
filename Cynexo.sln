@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cynexo.Controller", "cynexo.controller\Cynexo.Controller.csproj", "{5AF4BFB5-CAF7-4DFA-AA4D-2A16E52EEBB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cynexo.Communicator", "cynexo.communicator\Cynexo.Communicator.csproj", "{5AF4BFB5-CAF7-4DFA-AA4D-2A16E52EEBB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Controller", "test.controller\Test.Controller.csproj", "{9232BAC0-9904-44FB-82FF-1731C76550B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Communicator", "test.communicator\Test.Communicator.csproj", "{9232BAC0-9904-44FB-82FF-1731C76550B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cynexo.App", "cynexo.app\Cynexo.App.csproj", "{10F26771-367A-45F3-88C4-43ADA890D1D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{9232BAC0-9904-44FB-82FF-1731C76550B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9232BAC0-9904-44FB-82FF-1731C76550B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9232BAC0-9904-44FB-82FF-1731C76550B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F26771-367A-45F3-88C4-43ADA890D1D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F26771-367A-45F3-88C4-43ADA890D1D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F26771-367A-45F3-88C4-43ADA890D1D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F26771-367A-45F3-88C4-43ADA890D1D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

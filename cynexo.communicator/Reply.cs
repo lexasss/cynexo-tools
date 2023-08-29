@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cynexo.Controller
+namespace Cynexo.Communicator
 {
     public class Reply
     {

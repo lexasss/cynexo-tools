@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\cynexo.controller\Cynexo.Controller.csproj" />
+    <ProjectReference Include="..\cynexo.communicator\Cynexo.Communicator.csproj" />
   </ItemGroup>
 
 </Project>

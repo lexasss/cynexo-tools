@@ -1,4 +1,4 @@
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// The interface lists the minimum fuctionality required from <see cref="System.IO.Ports.SerialPort"/>.

@@ -3,11 +3,11 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// Communication over COM port with Smell Inpspector device
-/// Note that this is a simpliefied version of <see cref="Cynexo.Controller.CommPort"/>
+/// Note that this is a simpliefied version of <see cref="Cynexo.Communicator.CommPort"/>
 /// </summary>
 public class CommPort
 {

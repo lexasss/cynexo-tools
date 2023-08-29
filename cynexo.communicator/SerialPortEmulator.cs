@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Cynexo.Controller;
+namespace Cynexo.Communicator;
 
 /// <summary>
 /// This class is used to emulate communication with the device via <see cref="CommPort"/>
