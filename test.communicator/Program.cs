@@ -13,7 +13,7 @@ var commands = new Dictionary<string, (string, string?)>()
     { "o", ("set valve = OPENED", Command.SetValve(true)) },
     { "c", ("set valve = CLOSED", Command.SetValve(false)) },
     { "v500", ("open valve for 500 ms", Command.OpenValve(500)) },
-    { "r", ("set verbose = TRUE", Command.ReadFlow) },
+    { "r", ("read flow", Command.ReadFlow) },
     { "oa", ("open all valves", Command.SetAllSolenoidValves(true)) },
     { "ca", ("close all valves", Command.SetAllSolenoidValves(false)) },
     { "do", ("set stepper motor to direction = OPEN", Command.SetMotorDirection(true)) },

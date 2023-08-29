@@ -47,7 +47,7 @@ public class SerialPortCOM : ISerialPort
 
     // Internal
 
-    const int PORT_SPEED = 115200;
+    const int PORT_SPEED = 9600;
     const Parity PORT_PARITY = Parity.None;
     const StopBits PORT_STOP_BITS = StopBits.One;
     const int PORT_DATA_BITS = 8;

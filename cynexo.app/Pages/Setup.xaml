@@ -169,7 +169,11 @@
                         <Label Grid.Column="0" FontWeight="Bold">Function</Label>
                         <Label Grid.Column="1" FontWeight="Bold">Params</Label>
 
-                        <Label Grid.Row="1" Grid.Column="0">Calibrate flows</Label>
+                        <Label Grid.Row="1" Grid.Column="0">
+                            <Label.Content>
+                                <TextBlock>Calibrate flows<LineBreak/> automatically</TextBlock>
+                            </Label.Content>
+                        </Label>
                         <WrapPanel x:Name="wplCalibration" Grid.Row="1" Grid.Column="1">
                             <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
@@ -232,7 +236,7 @@
                         </WrapPanel>
                         <Button Grid.Row="1" Grid.Column="2"
                             Content="Start"
-                            Click="Calibrate_Click"/>
+                            Click="SetFlow_Click"/>
 
                         <Label Grid.Row="2" Grid.Column="0">Calibrate manually</Label>
                         <Grid Grid.Row="2" Grid.Column="1">

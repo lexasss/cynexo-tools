@@ -130,7 +130,7 @@ public class CommPort
 
         try
         {
-            _port?.WriteLine(command + "\n");
+            _port?.WriteLine(command + "\r");
         }
         catch
         {

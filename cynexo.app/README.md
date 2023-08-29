@@ -1,9 +1,4 @@
-# Cynexo Sniff-0 device app
-
-## Dependencies
-
-NuGet packages:
-- ScottPlot.WPF
+# Cynexo Sniff-0 device control app
 
 ## Connecting to the device
 
