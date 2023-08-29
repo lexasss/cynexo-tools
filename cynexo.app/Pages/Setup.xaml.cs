@@ -37,7 +37,6 @@ public partial class Setup : Page, IPage<Navigation>
         }));
     }
 
-    [Utils.Logging]
     private void HandleResponse(Communicator.Result result, [CallerMemberName] string propertyName = default!)
     {
         txbResponses.Text += $"{propertyName}: {result}\n";
