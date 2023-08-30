@@ -41,7 +41,7 @@ public partial class Setup : Page, IPage<Navigation>
                 if (ctrl is CheckBox chk && chk.Name.StartsWith("chkCalibChannel"))
                 {
                     int id = int.Parse((string)chk.Tag) - Command.MinChannelID;
-                    props[id] = props[id] with { Use = chk.IsChecked ?? false };
+                    props[id] = props[id] with { Use = chk.IsChecked == true };
                 }
                 else if (ctrl is TextBox txb && txb.Name.StartsWith("txbCalibChannel"))
                 {
@@ -118,13 +118,13 @@ public partial class Setup : Page, IPage<Navigation>
         Next?.Invoke(this, Navigation.Exit);
 
     private void SetVerbose_Toggled(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetVerbose(tbnSetVerbose.IsChecked ?? false)));
+        HandleResponse(_sniff0.Send(Command.SetVerbose(tbnSetVerbose.IsChecked == true)));
 
     private void SetVerboseLCD_Toggled(object sender, RoutedEventArgs e)
     {
         if (IsLoaded)
         {
-            HandleResponse(_sniff0.Send(Command.SetVerboseLCD(tbnSetVerboseLCD.IsChecked ?? false)));
+            HandleResponse(_sniff0.Send(Command.SetVerboseLCD(tbnSetVerboseLCD.IsChecked == true)));
         }
     }
 
@@ -132,7 +132,7 @@ public partial class Setup : Page, IPage<Navigation>
         HandleResponse(_sniff0.Send(Command.SetCAChannel((int)sldSetCAChannel.Value)));
 
     private void OpenCloseValves_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetAllSolenoidValves(cmbOpenCloseValves.SelectedIndex == 0)));
+        HandleResponse(_sniff0.Send(Command.SetAllSolenoidValves(rdbOpenValves.IsChecked == true)));
 
     private void SetFlow_Click(object sender, RoutedEventArgs e)
     {
@@ -160,10 +160,10 @@ public partial class Setup : Page, IPage<Navigation>
         HandleResponse(_sniff0.Send(Command.ReadFlow));
 
     private void SetValve_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetValve(cmbSetValve.SelectedIndex == 0, chkSetValveTrigger.IsChecked ?? false)));
+        HandleResponse(_sniff0.Send(Command.SetValve(rdbSetValveOpened.IsChecked == true, chkSetValveTrigger.IsChecked == true)));
 
     private void SetMotorDirection_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetMotorDirection(cmbSetMotorDirection.SelectedIndex == 0)));
+        HandleResponse(_sniff0.Send(Command.SetMotorDirection(rdbSetMotorDirectionToOpen.IsChecked == true)));
 
     private void RunMotorSteps_Click(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.RunMotorSteps((int)sldRunMotorSteps.Value)));
@@ -174,15 +174,15 @@ public partial class Setup : Page, IPage<Navigation>
         {
             if (rdbOpenValveSimple.IsChecked == true)
             {
-                HandleResponse(_sniff0.Send(Command.OpenValve(ms, chkOpenValveTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValve(ms, chkOpenValveTrigger.IsChecked == true)));
             }
             else if (rdbOpenValveNoCA.IsChecked == true)
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveWithoutCleanAir(ms, chkOpenValveTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveWithoutCleanAir(ms, chkOpenValveTrigger.IsChecked == true)));
             }
             else if (rdbOpenValveNoCF.IsChecked == true)
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveWithoutConstantFlow(ms, chkOpenValveTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveWithoutConstantFlow(ms, chkOpenValveTrigger.IsChecked == true)));
             }
         }
     }
@@ -220,11 +220,11 @@ public partial class Setup : Page, IPage<Navigation>
             int channel = (int)sldOpenValveOn.Value;
             if (cmbOpenValveOn.SelectedIndex == 0)
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveOnInhale(channel, duration, delay, chkOpenValveOnSecondTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveOnInhale(channel, duration, delay, chkOpenValveOnSecondTrigger.IsChecked == true)));
             }
             else
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveOnExhale(channel, duration, delay, chkOpenValveOnSecondTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveOnExhale(channel, duration, delay, chkOpenValveOnSecondTrigger.IsChecked == true)));
             }
         }
     }
@@ -237,11 +237,11 @@ public partial class Setup : Page, IPage<Navigation>
             int channel = (int)sldOpenValveSound.Value;
             if (cmbOpenValveSound.SelectedIndex == 0)
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveAfterSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveAfterSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked == true)));
             }
             else
             {
-                HandleResponse(_sniff0.Send(Command.OpenValveThenSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked ?? false)));
+                HandleResponse(_sniff0.Send(Command.OpenValveThenSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked == true)));
             }
         }
     }

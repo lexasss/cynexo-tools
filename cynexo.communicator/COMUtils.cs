@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
@@ -103,7 +102,7 @@ public class COMUtils
 
         try
         {
-            using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%(COM%' OR Caption LIKE '%Smellodi%'");
+            using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%COM%'");
             ManagementBaseObject[]? records = searcher.Get().Cast<ManagementBaseObject>().ToArray();
             ports = records.Select(rec =>
                 {

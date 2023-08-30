@@ -27,6 +27,13 @@
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="MinWidth" Value="50"/>
         </Style>
+        <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type RadioButton}}">
+            <Setter Property="Margin" Value="0,2,20,2"/>
+        </Style>
+
+        <Style TargetType="{x:Type WrapPanel}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
 
         <Style TargetType="TabControl">
             <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
@@ -122,7 +129,6 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="channel"/>
                             <Label Grid.Column="1" Content="{Binding Value, ElementName=sldSetCAChannel}"/>
                             <Slider Grid.Column="2" x:Name="sldSetCAChannel"
                                     Minimum="{Binding Path=(local:Command.MinChannelID)}"
@@ -133,10 +139,10 @@
                             Click="SetCAChannel_Click"/>
 
                         <Label Grid.Row="4" Grid.Column="0">All solenoid valves</Label>
-                        <ComboBox x:Name="cmbOpenCloseValves" Grid.Row="4" Grid.Column="1">
-                            <ComboBoxItem Content="opened" IsSelected="True"/>
-                            <ComboBoxItem Content="closed"/>
-                        </ComboBox>
+                        <WrapPanel Grid.Row="4" Grid.Column="1">
+                            <RadioButton x:Name="rdbOpenValves" GroupName="OpenCloseValves" Content="opened"/>
+                            <RadioButton x:Name="rdbCloseValves" GroupName="OpenCloseValves" Content="closed" IsChecked="True"/>
+                        </WrapPanel> 
                         <Button Grid.Row="4" Grid.Column="2"
                             Content="Set"
                             Click="OpenCloseValves_Click"/>
@@ -163,7 +169,7 @@
 
                         <Label Grid.Row="1" Grid.Column="0">
                             <Label.Content>
-                                <TextBlock>Calibrate flows<LineBreak/> automatically</TextBlock>
+                                <TextBlock>Calibrate channel<LineBreak/>flows automatically</TextBlock>
                             </Label.Content>
                         </Label>
                         <WrapPanel x:Name="wplCalibration" Grid.Row="1" Grid.Column="1">
@@ -326,12 +332,11 @@
                             Click="ReadFlow_Click"/>
 
                         <Label Grid.Row="3" Grid.Column="0">Set valve</Label>
-                        <ComboBox x:Name="cmbSetValve" Grid.Row="3" Grid.Column="1">
-                            <ComboBoxItem Content="opened" IsSelected="True"/>
-                            <ComboBoxItem Content="closed"/>
-                        </ComboBox>
+                        <WrapPanel Grid.Row="3" Grid.Column="1">
+                            <RadioButton x:Name="rdbSetValveOpened" GroupName="SetValve" Content="opened" IsChecked="True"/>
+                            <RadioButton x:Name="rdbSetValveClosed" GroupName="SetValve" Content="closed"/>
+                        </WrapPanel>
                         <WrapPanel Grid.Row="3" Grid.Column="2"
-                                   VerticalAlignment="Center"
                                    HorizontalAlignment="Center">
                             <CheckBox x:Name="chkSetValveTrigger"
                                       Width="24"
@@ -342,10 +347,10 @@
                             Click="SetValve_Click"/>
 
                         <Label Grid.Row="4" Grid.Column="0">Set motor direction</Label>
-                        <ComboBox x:Name="cmbSetMotorDirection" Grid.Row="4" Grid.Column="1">
-                            <ComboBoxItem Content="to open" IsSelected="True"/>
-                            <ComboBoxItem Content="ro close"/>
-                        </ComboBox>
+                        <WrapPanel Grid.Row="4" Grid.Column="1">
+                            <RadioButton x:Name="rdbSetMotorDirectionToOpen" GroupName="SetMotorDirection" Content="to open" IsChecked="True"/>
+                            <RadioButton x:Name="rdbSetMotorDirectionToClose" GroupName="SetMotorDirection" Content="to close"/>
+                        </WrapPanel>
                         <Button Grid.Row="4" Grid.Column="3"
                             Content="Set"
                             Click="SetMotorDirection_Click"/>
@@ -369,14 +374,13 @@
                         <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
                             <TextBox x:Name="txbOpenValve" Text="500"/>
                             <TextBlock Text="ms"/>
-                            <WrapPanel Margin="18,0,0,0" VerticalAlignment="Center">
-                                <RadioButton x:Name="rdbOpenValveSimple" GroupName="OpenValve" Content="normal" Margin="12,2" VerticalAlignment="Center" IsChecked="True"/>
-                                <RadioButton x:Name="rdbOpenValveNoCA" GroupName="OpenValve" Content="no clear air" Margin="12,2" VerticalAlignment="Center"/>
-                                <RadioButton x:Name="rdbOpenValveNoCF" GroupName="OpenValve" Content="no constant flow" Margin="12,2" VerticalAlignment="Center"/>
+                            <WrapPanel Margin="18,0,0,0">
+                                <RadioButton x:Name="rdbOpenValveSimple" GroupName="OpenValve" Content="normal" IsChecked="True"/>
+                                <RadioButton x:Name="rdbOpenValveNoCA" GroupName="OpenValve" Content="no clear air"/>
+                                <RadioButton x:Name="rdbOpenValveNoCF" GroupName="OpenValve" Content="no constant flow"/>
                             </WrapPanel>
                         </StackPanel>
                         <WrapPanel Grid.Row="6" Grid.Column="2"
-                                   VerticalAlignment="Center"
                                    HorizontalAlignment="Center">
                             <CheckBox x:Name="chkOpenValveTrigger"
                                       Width="24"
@@ -408,7 +412,7 @@
                         <Label Grid.Column="1" FontWeight="Bold">Params</Label>
 
                         <Label Grid.Row="1" Grid.Column="0">Set trigger-out delay</Label>
-                        <WrapPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                        <WrapPanel Grid.Row="1" Grid.Column="1">
                             <TextBox x:Name="txbSetTriggerOutDelay" Text="5"/>
                             <TextBlock Text="ms"/>
                         </WrapPanel>
@@ -417,7 +421,7 @@
                             Click="SetTriggerOutDelay_Click"/>
 
                         <Label Grid.Row="2" Grid.Column="0">Set trigger-out duration</Label>
-                        <WrapPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                        <WrapPanel Grid.Row="2" Grid.Column="1">
                             <TextBox x:Name="txbSetTriggerOutDuration" Text="5"/>
                             <TextBlock Text="ms"/>
                         </WrapPanel>
@@ -468,7 +472,7 @@
                         <Label Grid.Column="2" FontWeight="Bold">Trigger #2</Label>
 
                         <Label Grid.Row="1" Grid.Column="0">Open valve on</Label>
-                        <WrapPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                        <WrapPanel Grid.Row="1" Grid.Column="1">
                             <ComboBox x:Name="cmbOpenValveOn" MinWidth="60" MinHeight="28">
                                 <ComboBoxItem Content="inhale" IsSelected="True"/>
                                 <ComboBoxItem Content="exhale"/>
@@ -487,7 +491,6 @@
                             <Label Content="ms"/>
                         </WrapPanel>
                         <WrapPanel Grid.Row="1" Grid.Column="2"
-                                   VerticalAlignment="Center"
                                    HorizontalAlignment="Center">
                             <CheckBox x:Name="chkOpenValveOnSecondTrigger"
                                       Width="24"
@@ -501,7 +504,7 @@
                             <Label>Open valve</Label>
                             <Label>and make sound</Label>
                         </StackPanel>
-                        <WrapPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                        <WrapPanel Grid.Row="2" Grid.Column="1">
                             <ComboBox x:Name="cmbOpenValveSound" MinWidth="60" MinHeight="28">
                                 <ComboBoxItem Content="after" IsSelected="True"/>
                                 <ComboBoxItem Content="before"/>
@@ -520,7 +523,6 @@
                             <Label Content="ms"/>
                         </WrapPanel>
                         <WrapPanel Grid.Row="2" Grid.Column="2"
-                                   VerticalAlignment="Center"
                                    HorizontalAlignment="Center">
                             <CheckBox x:Name="chkOpenValveSoundSecondTrigger"
                                       Width="24"

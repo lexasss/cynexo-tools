@@ -6,8 +6,7 @@ using System.Threading;
 namespace Cynexo.Communicator;
 
 /// <summary>
-/// Communication over COM port with Smell Inpspector device
-/// Note that this is a simpliefied version of <see cref="Cynexo.Communicator.CommPort"/>
+/// Communication over COM port with Sniff-0 device
 /// </summary>
 public class CommPort
 {
@@ -85,14 +84,14 @@ public class CommPort
         }
         catch (Exception ex)
         {
-            Debug?.Invoke(this, $"COM [open] {ex.Message}\n{ex.StackTrace}");
-            return new Result("COM [open]", Error.OpenFailed, ex.Message);
+            Debug?.Invoke(this, $"COM open {ex.Message}\n{ex.StackTrace}");
+            return new Result("COM open", Error.OpenFailed, ex.Message);
         }
 
         if (!_port.IsOpen)
         {
             Close();
-            return new Result("COM [open]", Error.OpenFailed, "The port was created but still closed");
+            return new Result("COM open", Error.OpenFailed, "The port was created but still closed");
         }
 
         _readingThread = new Thread(ReadPacketsThread);
@@ -104,10 +103,11 @@ public class CommPort
 
         Opened?.Invoke(this, new EventArgs());
 
-        return Result.OK("COM [open]");
+        return Result.OK("COM open");
     }
 
     /// <summary>
+    /// Adds "\r" to the command and sends it to the COM port
     /// </summary>
     /// <param name="command">The command to send</param>
     public Result Send(string command)
@@ -162,7 +162,7 @@ public class CommPort
         port.ErrorReceived += (s, e) =>
         {
             PortError = e.EventType;
-            COMError?.Invoke(this, new Result("COM", (Error)Marshal.GetLastWin32Error(), $"COM internal error ({e.EventType})"));
+            COMError?.Invoke(this, new Result("COM error", (Error)Marshal.GetLastWin32Error(), e.EventType.ToString()));
         };
 
         return port;
@@ -171,7 +171,7 @@ public class CommPort
     /// <summary>
     /// Reads packets from the port. Gets the packet payload length from the second byte.
     /// </summary>
-    /// <param name="packet">Packet to be filled with data received from the port</param>
+    /// <param name="response">data received from the port</param>
     /// <returns><see cref="Error.Success"/> or an error code</returns>
     private Error Read(out string? response)
     {
@@ -225,17 +225,14 @@ public class CommPort
             {
                 Debug?.Invoke(this, $"ERR '{error}'");
             }
+            else if (response != null)
+            {
+                Debug?.Invoke(this, $"RCV {response}");
+                Data?.Invoke(this, response);
+            }
             else
             {
-                if (response != null)
-                {
-                    Debug?.Invoke(this, $"RCV {response}");
-                    Data?.Invoke(this, response);
-                }
-                else
-                {
-                    Debug?.Invoke(this, $"RCV !UNEXPECTED {response}");
-                }
+                Debug?.Invoke(this, $"RCV !UNEXPECTED {response}");
             }
         }
     }

@@ -11,4 +11,4 @@ The project is based on [.NET 6.0](https://dotnet.microsoft.com/download/dotnet)
 
 ## Download executables
 
-A stand-alone UI application package can be downloaded on the [Releases](https://github.com/lexasss/Cynexo/releases) page.
+The stand-alone UI application package can be downloaded on the [Releases](https://github.com/lexasss/Cynexo/releases) page.
