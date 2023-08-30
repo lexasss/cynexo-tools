@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Cynexo.Communicator;assembly=Cynexo.Communicator" 
+      xmlns:cntrl="clr-namespace:NumericUpDownLib;assembly=NumericUpDownLib"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="1000"
       Title="Controller"
@@ -29,6 +30,15 @@
         </Style>
         <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type RadioButton}}">
             <Setter Property="Margin" Value="0,2,20,2"/>
+        </Style>
+
+        <Style x:Key="Channel" TargetType="{x:Type cntrl:NumericUpDown}" BasedOn="{StaticResource {x:Type cntrl:NumericUpDown}}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Value" Value="{Binding Path=(local:Command.MinChannelID), Mode=OneTime}"/>
+            <Setter Property="MaxValue" Value="{Binding Path=(local:Command.MaxChannelID), Mode=OneTime}"/>
+            <Setter Property="MinValue" Value="{Binding Path=(local:Command.MinChannelID), Mode=OneTime}"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
 
         <Style TargetType="{x:Type WrapPanel}">
@@ -80,7 +90,7 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="730"/>
+                <ColumnDefinition Width="678"/>
             </Grid.ColumnDefinitions>
 
             <TextBox x:Name="txbResponses" Grid.Column="0"
@@ -123,17 +133,7 @@
                             Unchecked="SetVerboseLCD_Toggled"/>
 
                         <Label Grid.Row="3" Grid.Column="0">Set clear air channel</Label>
-                        <Grid Grid.Row="3" Grid.Column="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Label Grid.Column="1" Content="{Binding Value, ElementName=sldSetCAChannel}"/>
-                            <Slider Grid.Column="2" x:Name="sldSetCAChannel"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
-                        </Grid>
+                        <cntrl:NumericUpDown x:Name="nudSetCAChannel" Style="{StaticResource Channel}" Grid.Row="3" Grid.Column="1"/>
                         <Button Grid.Row="3" Grid.Column="2"
                             Content="Set"
                             Click="SetCAChannel_Click"/>
@@ -250,14 +250,10 @@
                         <Grid Grid.Row="2" Grid.Column="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
-                            <Label Grid.Column="1" Content="{Binding Value, ElementName=sldCalibrateManually}"/>
-                            <Slider Grid.Column="2" x:Name="sldCalibrateManually"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
+                            <cntrl:NumericUpDown x:Name="nudCalibrateManually" Style="{StaticResource Channel}" Grid.Column="1"/>
                         </Grid>
                         <Button Grid.Row="2" Grid.Column="2"
                             Content="Start"
@@ -276,10 +272,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
-                            <Label Grid.Column="1" Content="{Binding Value, ElementName=sldTestDelay}"/>
-                            <Slider Grid.Column="2" x:Name="sldTestDelay"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
+                            <cntrl:NumericUpDown x:Name="nudTestDelay" Style="{StaticResource Channel}" Grid.Column="1"/>
                         </Grid>
                         <Button Grid.Row="4" Grid.Column="2"
                             Content="Start"
@@ -317,10 +310,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
-                            <Label Grid.Column="1" Content="{Binding Value, ElementName=sldSetChannel}"/>
-                            <Slider Grid.Column="2" x:Name="sldSetChannel"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
+                            <cntrl:NumericUpDown x:Name="nudSetChannel" Style="{StaticResource Channel}" Grid.Column="1"/>
                         </Grid>
                         <Button Grid.Row="1" Grid.Column="3"
                             Content="Set"
@@ -372,7 +362,9 @@
 
                         <Label Grid.Row="6" Grid.Column="0">Open valve for (ms)</Label>
                         <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
-                            <TextBox x:Name="txbOpenValve" Text="500"/>
+                            <TextBox x:Name="txbOpenValve" 
+                                     VerticalAlignment="Center"
+                                     Text="500"/>
                             <TextBlock Text="ms"/>
                             <WrapPanel Margin="18,0,0,0">
                                 <RadioButton x:Name="rdbOpenValveSimple" GroupName="OpenValve" Content="normal" IsChecked="True"/>
@@ -478,11 +470,7 @@
                                 <ComboBoxItem Content="exhale"/>
                             </ComboBox>
                             <Label Content="channel:"/>
-                            <Label Content="{Binding Value, ElementName=sldOpenValveOn}" MinWidth="26"/>
-                            <Slider x:Name="sldOpenValveOn" 
-                                    MinWidth="100"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
+                            <cntrl:NumericUpDown x:Name="nudOpenValveOn" Style="{StaticResource Channel}" Grid.Column="1"/>
                             <Label Content="duration:"/>
                             <TextBox x:Name="txbOpenValveOnDuration" Text="500"/>
                             <Label Content="ms"/>
@@ -510,11 +498,7 @@
                                 <ComboBoxItem Content="before"/>
                             </ComboBox>
                             <Label Content="channel:"/>
-                            <Label Content="{Binding Value, ElementName=sldOpenValveSound}" MinWidth="26"/>
-                            <Slider x:Name="sldOpenValveSound" 
-                                    MinWidth="100"
-                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
-                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
+                            <cntrl:NumericUpDown x:Name="nudOpenValveSound" Style="{StaticResource Channel}" Grid.Column="1"/>
                             <Label Content="duration:"/>
                             <TextBox x:Name="txbOpenValveSoundDuration" Text="500"/>
                             <Label Content="ms"/>

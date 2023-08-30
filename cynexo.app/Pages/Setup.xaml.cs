@@ -129,7 +129,7 @@ public partial class Setup : Page, IPage<Navigation>
     }
 
     private void SetCAChannel_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetCAChannel((int)sldSetCAChannel.Value)));
+        HandleResponse(_sniff0.Send(Command.SetCAChannel(nudSetCAChannel.Value)));
 
     private void OpenCloseValves_Click(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.SetAllSolenoidValves(rdbOpenValves.IsChecked == true)));
@@ -145,16 +145,16 @@ public partial class Setup : Page, IPage<Navigation>
     }
 
     private void CalibrateManually_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetCAChannel((int)sldCalibrateManually.Value)));
+        HandleResponse(_sniff0.Send(Command.SetCAChannel(nudCalibrateManually.Value)));
 
     private void StopCalibration_Click(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.StopCalibration));
 
     private void TestDelay_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.TestDelay((int)sldTestDelay.Value)));
+        HandleResponse(_sniff0.Send(Command.TestDelay(nudTestDelay.Value)));
 
     private void SetChannel_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetChannel((int)sldSetChannel.Value)));
+        HandleResponse(_sniff0.Send(Command.SetChannel(nudSetChannel.Value)));
 
     private void ReadFlow_Click(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.ReadFlow));
@@ -217,7 +217,7 @@ public partial class Setup : Page, IPage<Navigation>
         if (int.TryParse(txbOpenValveOnDuration.Text, out int duration) && 
             int.TryParse(txbOpenValveOnDelay.Text, out int delay))
         {
-            int channel = (int)sldOpenValveOn.Value;
+            int channel = nudOpenValveOn.Value;
             if (cmbOpenValveOn.SelectedIndex == 0)
             {
                 HandleResponse(_sniff0.Send(Command.OpenValveOnInhale(channel, duration, delay, chkOpenValveOnSecondTrigger.IsChecked == true)));
@@ -234,7 +234,7 @@ public partial class Setup : Page, IPage<Navigation>
         if (int.TryParse(txbOpenValveSoundDuration.Text, out int duration) && 
             int.TryParse(txbOpenValveSoundDelay.Text, out int delay))
         {
-            int channel = (int)sldOpenValveSound.Value;
+            int channel = nudOpenValveSound.Value;
             if (cmbOpenValveSound.SelectedIndex == 0)
             {
                 HandleResponse(_sniff0.Send(Command.OpenValveAfterSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked == true)));

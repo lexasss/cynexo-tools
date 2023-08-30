@@ -39,6 +39,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dirkster.NumericUpDownLib" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\cynexo.communicator\Cynexo.Communicator.csproj" />
   </ItemGroup>
 
