@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Cynexo.Communicator;assembly=Cynexo.Communicator" 
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="1000"
       Title="Controller"
@@ -26,18 +27,6 @@
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="MinWidth" Value="50"/>
         </Style>
-        <!--Style x:Key="aa" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
-            <Setter Property="Margin" Value="4,2,12,2"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="Padding" Value="12,4"/>
-            <Setter Property="Margin" Value="0,2,4,2"/>
-        </Style>
-        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-            <Setter Property="Padding" Value="12,4"/>
-            <Setter Property="Margin" Value="0,2,4,2"/>
-        </Style-->
 
         <Style TargetType="TabControl">
             <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
@@ -83,13 +72,14 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="730"/>
             </Grid.ColumnDefinitions>
 
             <TextBox x:Name="txbResponses" Grid.Column="0"
                      IsReadOnly="True"
                      VerticalContentAlignment="Top"
+                     HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Visible"/>
 
             <TabControl Grid.Column="1">
@@ -134,7 +124,9 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
                             <Label Grid.Column="1" Content="{Binding Value, ElementName=sldSetCAChannel}"/>
-                            <Slider Grid.Column="2" x:Name="sldSetCAChannel" Minimum="1" Maximum="13"/>
+                            <Slider Grid.Column="2" x:Name="sldSetCAChannel"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                         </Grid>
                         <Button Grid.Row="3" Grid.Column="2"
                             Content="Set"
@@ -177,65 +169,75 @@
                         <WrapPanel x:Name="wplCalibration" Grid.Row="1" Grid.Column="1">
                             <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel1" Content="channel 1" Tag="1"/>
+                                    <CheckBox x:Name="chkCalibChannel1" Content="channel 1" Tag="1"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel1Flow" Text="1.0" Tag="1"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel2" Content="channel 2" Tag="2"/>
+                                    <CheckBox x:Name="chkCalibChannel2" Content="channel 2" Tag="2"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel2Flow" Text="1.0" Tag="2"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel3" Content="channel 3" Tag="3"/>
+                                    <CheckBox x:Name="chkCalibChannel3" Content="channel 3" Tag="3"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel3Flow" Text="1.0" Tag="3"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel4" Content="channel 4" Tag="4"/>
+                                    <CheckBox x:Name="chkCalibChannel4" Content="channel 4" Tag="4"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel4Flow" Text="1.0" Tag="4"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel5" Content="channel 5" Tag="5"/>
+                                    <CheckBox x:Name="chkCalibChannel5" Content="channel 5" Tag="5"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel5Flow" Text="1.0" Tag="5"/>
                                 </WrapPanel>
                             </StackPanel>
                             <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel6" Content="channel 6" Tag="6"/>
+                                    <CheckBox x:Name="chkCalibChannel6" Content="channel 6" Tag="6"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel6Flow" Text="1.0" Tag="6"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel7" Content="channel 7" Tag="7"/>
+                                    <CheckBox x:Name="chkCalibChannel7" Content="channel 7" Tag="7"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel7Flow" Text="1.0" Tag="7"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel8" Content="channel 8" Tag="8"/>
+                                    <CheckBox x:Name="chkCalibChannel8" Content="channel 8" Tag="8"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel8Flow" Text="1.0" Tag="8"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel9" Content="channel 9" Tag="9"/>
+                                    <CheckBox x:Name="chkCalibChannel9" Content="channel 9" Tag="9"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel9Flow" Text="1.0" Tag="9"/>
                                 </WrapPanel>
                             </StackPanel>
                             <StackPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel10" Content="channel 10" Tag="10"/>
+                                    <CheckBox x:Name="chkCalibChannel10" Content="channel 10" Tag="10" Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel10Flow" Text="1.0" Tag="11"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel11" Content="channel 11" Tag="11"/>
+                                    <CheckBox x:Name="chkCalibChannel11" Content="channel 11" Tag="11" Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel11Flow" Text="1.0" Tag="11"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel12" Content="channel 12" Tag="12"/>
+                                    <CheckBox x:Name="chkCalibChannel12" Content="channel 12" Tag="12" Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel12Flow" Text="1.0" Tag="12"/>
                                 </WrapPanel>
                                 <WrapPanel>
-                                    <CheckBox x:Name="chkCalibChannel13" Content="channel 13" Tag="13"/>
+                                    <CheckBox x:Name="chkCalibChannel13" Content="channel 13" Tag="13" Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel13Flow" Text="1.0" Tag="13"/>
                                 </WrapPanel>
                             </StackPanel>
                         </WrapPanel>
-                        <Button Grid.Row="1" Grid.Column="2"
+                        <Button x:Name="btnStartCalibration" Grid.Row="1" Grid.Column="2"
                             Content="Start"
+                                IsEnabled="False"
                             Click="SetFlow_Click"/>
 
                         <Label Grid.Row="2" Grid.Column="0">Calibrate manually</Label>
@@ -247,7 +249,9 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
                             <Label Grid.Column="1" Content="{Binding Value, ElementName=sldCalibrateManually}"/>
-                            <Slider Grid.Column="2" x:Name="sldCalibrateManually" Minimum="1" Maximum="13"/>
+                            <Slider Grid.Column="2" x:Name="sldCalibrateManually"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                         </Grid>
                         <Button Grid.Row="2" Grid.Column="2"
                             Content="Start"
@@ -267,7 +271,9 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
                             <Label Grid.Column="1" Content="{Binding Value, ElementName=sldTestDelay}"/>
-                            <Slider Grid.Column="2" x:Name="sldTestDelay" Minimum="1" Maximum="13"/>
+                            <Slider Grid.Column="2" x:Name="sldTestDelay"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                         </Grid>
                         <Button Grid.Row="4" Grid.Column="2"
                             Content="Start"
@@ -306,7 +312,9 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="channel"/>
                             <Label Grid.Column="1" Content="{Binding Value, ElementName=sldSetChannel}"/>
-                            <Slider Grid.Column="2" x:Name="sldSetChannel" Minimum="1" Maximum="13"/>
+                            <Slider Grid.Column="2" x:Name="sldSetChannel"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                         </Grid>
                         <Button Grid.Row="1" Grid.Column="3"
                             Content="Set"
@@ -322,8 +330,13 @@
                             <ComboBoxItem Content="opened" IsSelected="True"/>
                             <ComboBoxItem Content="closed"/>
                         </ComboBox>
-                        <CheckBox x:Name="chkSetValveTrigger" Grid.Row="3" Grid.Column="2"
-                                  HorizontalAlignment="Center"/>
+                        <WrapPanel Grid.Row="3" Grid.Column="2"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center">
+                            <CheckBox x:Name="chkSetValveTrigger"
+                                      Width="24"
+                                      Height="24"/>
+                        </WrapPanel>
                         <Button Grid.Row="3" Grid.Column="3"
                             Content="Set"
                             Click="SetValve_Click"/>
@@ -362,8 +375,13 @@
                                 <RadioButton x:Name="rdbOpenValveNoCF" GroupName="OpenValve" Content="no constant flow" Margin="12,2" VerticalAlignment="Center"/>
                             </WrapPanel>
                         </StackPanel>
-                        <CheckBox x:Name="chkOpenValveTrigger" Grid.Row="6" Grid.Column="2"
-                                  HorizontalAlignment="Center"/>
+                        <WrapPanel Grid.Row="6" Grid.Column="2"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center">
+                            <CheckBox x:Name="chkOpenValveTrigger"
+                                      Width="24"
+                                      Height="24"/>
+                        </WrapPanel>
                         <Button Grid.Row="6" Grid.Column="3"
                             Content="Open"
                             Click="OpenValve_Click"/>
@@ -456,17 +474,25 @@
                                 <ComboBoxItem Content="exhale"/>
                             </ComboBox>
                             <Label Content="channel:"/>
-                            <Label Content="{Binding Value, ElementName=sldOpenValveOn}"/>
-                            <Slider x:Name="sldOpenValveOn" Minimum="1" Maximum="13" MinWidth="100"/>
+                            <Label Content="{Binding Value, ElementName=sldOpenValveOn}" MinWidth="26"/>
+                            <Slider x:Name="sldOpenValveOn" 
+                                    MinWidth="100"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                             <Label Content="duration:"/>
-                            <TextBox x:Name="txbOpenValveOnDuration"/>
+                            <TextBox x:Name="txbOpenValveOnDuration" Text="500"/>
                             <Label Content="ms"/>
                             <Label Content="delay:"/>
-                            <TextBox x:Name="txbOpenValveOnDelay"/>
+                            <TextBox x:Name="txbOpenValveOnDelay" Text="500"/>
                             <Label Content="ms"/>
                         </WrapPanel>
-                        <CheckBox x:Name="chkOpenValveOnSecondTrigger" Grid.Row="1" Grid.Column="2"
-                                  HorizontalAlignment="Center"/>
+                        <WrapPanel Grid.Row="1" Grid.Column="2"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center">
+                            <CheckBox x:Name="chkOpenValveOnSecondTrigger"
+                                      Width="24"
+                                      Height="24"/>
+                        </WrapPanel>
                         <Button Grid.Row="1" Grid.Column="3"
                             Content="Open"
                             Click="OpenValveOn_Click"/>
@@ -481,17 +507,25 @@
                                 <ComboBoxItem Content="before"/>
                             </ComboBox>
                             <Label Content="channel:"/>
-                            <Label Content="{Binding Value, ElementName=sldOpenValveSound}"/>
-                            <Slider x:Name="sldOpenValveSound" Minimum="1" Maximum="13" MinWidth="100"/>
+                            <Label Content="{Binding Value, ElementName=sldOpenValveSound}" MinWidth="26"/>
+                            <Slider x:Name="sldOpenValveSound" 
+                                    MinWidth="100"
+                                    Minimum="{Binding Path=(local:Command.MinChannelID)}"
+                                    Maximum="{Binding Path=(local:Command.MaxChannelID)}"/>
                             <Label Content="duration:"/>
-                            <TextBox x:Name="txbOpenValveSoundDuration"/>
+                            <TextBox x:Name="txbOpenValveSoundDuration" Text="500"/>
                             <Label Content="ms"/>
                             <Label Content="delay:"/>
-                            <TextBox x:Name="txbOpenValveSoundDelay"/>
+                            <TextBox x:Name="txbOpenValveSoundDelay" Text="500"/>
                             <Label Content="ms"/>
                         </WrapPanel>
-                        <CheckBox x:Name="chkOpenValveSoundSecondTrigger" Grid.Row="2" Grid.Column="2"
-                                  HorizontalAlignment="Center"/>
+                        <WrapPanel Grid.Row="2" Grid.Column="2"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center">
+                            <CheckBox x:Name="chkOpenValveSoundSecondTrigger"
+                                      Width="24"
+                                      Height="24"/>
+                        </WrapPanel>
                         <Button Grid.Row="2" Grid.Column="3"
                             Content="Open"
                             Click="OpenValveSound_Click"/>

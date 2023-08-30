@@ -86,21 +86,13 @@ public class CommPort
         catch (Exception ex)
         {
             Debug?.Invoke(this, $"COM [open] {ex.Message}\n{ex.StackTrace}");
-            return new Result()
-            {
-                Error = Error.OpenFailed,
-                Reason = ex.Message
-            };
+            return new Result("COM [open]", Error.OpenFailed, ex.Message);
         }
 
         if (!_port.IsOpen)
         {
             Close();
-            return new Result()
-            {
-                Error = Error.OpenFailed,
-                Reason = "The port was created but still closed"
-            };
+            return new Result("COM [open]", Error.OpenFailed, "The port was created but still closed");
         }
 
         _readingThread = new Thread(ReadPacketsThread);
@@ -112,11 +104,7 @@ public class CommPort
 
         Opened?.Invoke(this, new EventArgs());
 
-        return new Result()
-        {
-            Error = Error.Success,
-            Reason = "Port opened"
-        };
+        return Result.OK("COM [open]");
     }
 
     /// <summary>
@@ -134,18 +122,10 @@ public class CommPort
         }
         catch
         {
-            return new Result()
-            {
-                Error = Error.AccessFailed,
-                Reason = "Failed to writing to the port"
-            };
+            return new Result($"COM [{command}]", Error.AccessFailed, "Failed to writing to the port");
         }
 
-        return new Result()
-        {
-            Error = Error.Success,
-            Reason = "OK"
-        };
+        return Result.OK($"COM [{command}]");
     }
 
 
@@ -182,11 +162,7 @@ public class CommPort
         port.ErrorReceived += (s, e) =>
         {
             PortError = e.EventType;
-            COMError?.Invoke(this, new Result()
-            {
-                Error = (Error)Marshal.GetLastWin32Error(),
-                Reason = $"COM internal error ({e.EventType})"
-            });
+            COMError?.Invoke(this, new Result("COM", (Error)Marshal.GetLastWin32Error(), $"COM internal error ({e.EventType})"));
         };
 
         return port;

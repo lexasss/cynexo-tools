@@ -11,33 +11,9 @@ public enum Error
     Success = 0,
 
     /// <summary>
-    /// ERROR_INVALID_FUNCTION, <see cref="Packets.Type.Ack"/> packet returned as error
-    /// </summary>
-    DeviceError = 0x01,
-
-    /// <summary>
-    /// ERROR_BAD_FORMAT
-    /// </summary>
-    //BadDataFormat = 0x0B,
-    /// <summary>
-    /// ERROR_INVALID_ACCESS
-    /// </summary>
-    //WrongDevice = 0x0C,
-
-    /// <summary>
-    /// ERROR_INVALID_DATA, something is wrong with the received data: it is not following the expected pattern
-    /// </summary>
-    InvalidData = 0x0D,
-
-    /// <summary>
     /// ERROR_NOT_READY, the port is not open yet/already
     /// </summary>
     NotReady = 0x15,
-
-    /// <summary>
-    /// ERROR_CRC, the received and the calculated CRCs do not match
-    /// </summary>
-    CRC = 0x17,
 
     /// <summary>
     /// ERROR_GEN_FAILURE, reading the port resulted in an exception
@@ -49,11 +25,6 @@ public enum Error
     /// </summary>
     /// 
     OpenFailed = 0x6E,
-
-    /// <summary>
-    /// WAIT_TIMEOUT, either the request packet was not sent or its response not received within <see cref="TimedRequest.WaitInterval"/> ms
-    /// </summary>
-    Timeout = 0x102,
 }
 
 /// <summary>
@@ -61,8 +32,18 @@ public enum Error
 /// </summary>
 public class Result
 {
+    public string Operation { get; init; }
     public Error Error { get; init; }
     public string? Reason { get; init; }
 
-    public override string ToString() => $"{Error} ({Reason})";
+    public Result(string operation, Error error, string reason)
+    {
+        Operation = operation;
+        Error = error;
+        Reason = reason;
+    }
+
+    public static Result OK(string operation) => new Result(operation, Error.Success, "OK");
+
+    public override string ToString() => $"{Operation} >> {Error} ({Reason})";
 }

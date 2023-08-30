@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +26,42 @@ public partial class Setup : Page, IPage<Navigation>
     readonly Storage _storage = Storage.Instance;
     readonly CommPort _sniff0 = CommPort.Instance;
 
+    private ChannelCalibration[] GetCalibChannels()
+    {
+        var props = new List<ChannelCalibration>();
+        for (int id = Command.MinChannelID; id <= Command.MaxChannelID; id++)
+        {
+            props.Add(new ChannelCalibration(id, false, 0));
+        }
+
+        void CheckChildren(UIElementCollection controls)
+        {
+            foreach (UIElement ctrl in controls)
+            {
+                if (ctrl is CheckBox chk && chk.Name.StartsWith("chkCalibChannel"))
+                {
+                    int id = int.Parse((string)chk.Tag) - Command.MinChannelID;
+                    props[id] = props[id] with { Use = chk.IsChecked ?? false };
+                }
+                else if (ctrl is TextBox txb && txb.Name.StartsWith("txbCalibChannel"))
+                {
+                    if (float.TryParse((ctrl as TextBox)?.Text, out float flow))
+                    {
+                        int id = int.Parse((string)txb.Tag) - Command.MinChannelID;
+                        props[id] = props[id] with { Flow = flow };
+                    }
+                }
+                else if (ctrl is Panel panel)
+                {
+                    CheckChildren(panel.Children);
+                }
+            }
+        }
+
+        CheckChildren(wplCalibration.Children);
+        return props.ToArray();
+    }
+
     // Event handlers
 
     private async void OnData(object? sender, string data)
@@ -47,9 +82,9 @@ public partial class Setup : Page, IPage<Navigation>
         }));
     }
 
-    private void HandleResponse(Result result, [CallerMemberName] string propertyName = default!)
+    private void HandleResponse(Result result)
     {
-        txbResponses.Text += $"{propertyName}: {result}\n";
+        txbResponses.Text += $"{result}\n";
         txbResponses.ScrollToEnd();
     }
 
@@ -101,39 +136,11 @@ public partial class Setup : Page, IPage<Navigation>
 
     private void SetFlow_Click(object sender, RoutedEventArgs e)
     {
-        var props = new List<ChannelCalibration>();
-        for (int i = 0; i < 13; i++)
-        {
-            props.Add(new ChannelCalibration(0, false, 0));
-        }
 
-        void CheckChildren(UIElementCollection controls)
-        {
-            foreach (UIElement ctrl in controls)
-            {
-                if (ctrl is CheckBox chk && chk.Name.StartsWith("chkCalibChannel"))
-                {
-                    int id = int.Parse((string)chk.Tag);
-                    props[id - 1] = props[id - 1] with { Id = id, Use = chk.IsChecked ?? false };
-                }
-                else if (ctrl is TextBox txb && txb.Name.StartsWith("txbCalibChannel"))
-                {
-                    if (float.TryParse((ctrl as TextBox)?.Text, out float flow))
-                    {
-                        int id = int.Parse((string)txb.Tag);
-                        props[id - 1] = props[id - 1] with { Id = id, Flow = flow };
-                    }
-                }
-                else if (ctrl is Panel panel)
-                {
-                    CheckChildren(panel.Children);
-                }
-            }
-        }
+        var kvs = GetCalibChannels()
+            .Where(p => p.Use && p.Flow > 0)
+            .Select(p => new KeyValuePair<int, float>(p.Id, p.Flow));
 
-        CheckChildren(wplCalibration.Children);
-
-        var kvs = props.Where(p => p.Use).Select(p => new KeyValuePair<int, float>(p.Id, p.Flow));
         HandleResponse(_sniff0.Send(Command.SetFlow(kvs.ToArray())));
     }
 
@@ -237,5 +244,12 @@ public partial class Setup : Page, IPage<Navigation>
                 HandleResponse(_sniff0.Send(Command.OpenValveThenSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked ?? false)));
             }
         }
+    }
+
+    private void CalibChannel_Toggled(object sender, RoutedEventArgs e)
+    {
+        btnStartCalibration.IsEnabled = GetCalibChannels()
+            .Where(p => p.Use)
+            .Count() > 0;
     }
 }

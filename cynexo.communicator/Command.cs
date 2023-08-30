@@ -8,6 +8,10 @@ namespace Cynexo.Communicator;
 /// </summary>
 public static class Command
 {
+    public static int MinChannelID => 1;
+    public static int MaxChannelID => 13;
+
+
     #region General
 
     /// <summary>
@@ -35,13 +39,13 @@ public static class Command
     /// <summary>
     /// Sets the channel to be used as the Clean Air channel
     /// </summary>
-    /// <param name="channel">channel ID from the range <see cref="MIN_CHANNEL_ID"/>..<see cref="MAX_CHANNEL_ID"/></param>
+    /// <param name="channel">channel ID from the range <see cref="MinChannelID"/>..<see cref="MaxChannelID"/></param>
     /// <returns>String to send to the port</returns>
     public static string SetCAChannel(int channel)
     {
-        if (channel < MIN_CHANNEL_ID || channel > MAX_CHANNEL_ID)
+        if (channel < MinChannelID || channel > MaxChannelID)
         {
-            throw new ArgumentException($"Channel must be in the range {MIN_CHANNEL_ID}..{MAX_CHANNEL_ID}");
+            throw new ArgumentException($"Channel must be in the range {MinChannelID}..{MaxChannelID}");
         }
 
         return $"setCAChannel {channel}";
@@ -104,13 +108,13 @@ public static class Command
     /// <summary>
     /// Set the active channel that is implicitely used to operate in further commands
     /// </summary>
-    /// <param name="channel">channel ID from the range <see cref="MIN_CHANNEL_ID"/>..<see cref="MAX_CHANNEL_ID"/></param>
+    /// <param name="channel">channel ID from the range <see cref="MinChannelID"/>..<see cref="MaxChannelID"/></param>
     /// <returns>String to send to the port</returns>
     public static string SetChannel(int channel)
     {
-        if (channel < MIN_CHANNEL_ID || channel > MAX_CHANNEL_ID)
+        if (channel < MinChannelID || channel > MaxChannelID)
         {
-            throw new ArgumentException($"Channel must be in the range {MIN_CHANNEL_ID}..{MAX_CHANNEL_ID}");
+            throw new ArgumentException($"Channel must be in the range {MinChannelID}..{MaxChannelID}");
         }
 
         return $"setChannel {channel}";
@@ -292,9 +296,6 @@ public static class Command
 
 
     // Internal
-
-    const int MIN_CHANNEL_ID = 1;
-    const int MAX_CHANNEL_ID = 13;
 
     private static string GetSecondTriggerCmd(bool useSecondTrigger) => useSecondTrigger ? "ta_" : "";
 }

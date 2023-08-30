@@ -6,11 +6,6 @@ namespace Cynexo.Communicator;
 /// </summary>
 public interface ISerialPort
 {
-    /// <summary>
-    /// Interval between data events, seconds
-    /// </summary>
-    readonly static double Interval = 1.8;
-
     bool IsOpen { get; }
 
     void Open();
