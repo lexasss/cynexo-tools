@@ -41,33 +41,13 @@
             <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
 
+        <Style x:Key="ChannelAll" TargetType="{x:Type cntrl:NumericUpDown}" BasedOn="{StaticResource Channel}">
+            <Setter Property="Value" Value="0"/>
+            <Setter Property="MinValue" Value="0"/>
+        </Style>
+
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-
-        <Style TargetType="TabControl">
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
-            <Setter Property="Padding" Value="2"/>
-        </Style>
-
-        <Style TargetType="TabItem">
-            <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="Foreground" Value="{StaticResource BrushFont}"/>
-            <Setter Property="Background" Value="{StaticResource BrushButton}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Foreground" Value="{StaticResource BrushFontDark}"/>
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="{StaticResource BrushFontDark}"/>
-                    <Setter Property="Background" Value="{StaticResource BrushButtonHover}"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="{StaticResource BrushFontDarkDisabled}"/>
-                    <Setter Property="Background" Value="{StaticResource BrushButtonDisabled}"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
     </Page.Resources>
@@ -133,7 +113,7 @@
                             Unchecked="SetVerboseLCD_Toggled"/>
 
                         <Label Grid.Row="3" Grid.Column="0">Set clear air channel</Label>
-                        <cntrl:NumericUpDown x:Name="nudSetCAChannel" Style="{StaticResource Channel}" Grid.Row="3" Grid.Column="1"/>
+                        <cntrl:NumericUpDown x:Name="nudSetCAChannel" Style="{StaticResource ChannelAll}" Grid.Row="3" Grid.Column="1"/>
                         <Button Grid.Row="3" Grid.Column="2"
                             Content="Set"
                             Click="SetCAChannel_Click"/>

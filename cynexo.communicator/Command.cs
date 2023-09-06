@@ -43,9 +43,9 @@ public static class Command
     /// <returns>String to send to the port</returns>
     public static string SetCAChannel(int channel)
     {
-        if (channel < MinChannelID || channel > MaxChannelID)
+        if (channel < 0 || channel > MaxChannelID)
         {
-            throw new ArgumentException($"Channel must be in the range {MinChannelID}..{MaxChannelID}");
+            throw new ArgumentException($"Channel must be in the range {0}..{MaxChannelID}");
         }
 
         return $"setCAChannel {channel}";
