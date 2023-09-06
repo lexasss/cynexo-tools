@@ -9,9 +9,23 @@
     <Application.Resources>
         <ResourceDictionary>
             <!-- Theme colors -->
-            
+
+
+            <!-- TUNI -->
+            <Color x:Key="ColorLight">#EBDAFF</Color>
+            <Color x:Key="ColorLightDarker">#9A6AD4</Color>
+            <Color x:Key="ColorDarkLighter">#6C39AA</Color>
+            <Color x:Key="ColorDark">#451580</Color>
+            <Color x:Key="ColorDarkDarker">#360055</Color>
+
+            <Color x:Key="ColorDisabledLight">#ECECEC</Color>
+            <Color x:Key="ColorDisabledLightDarker">#9F9F9F</Color>
+            <Color x:Key="ColorDisabledDarkLighter">#717171</Color>
+            <Color x:Key="ColorDisabledDark">#4A4A4A</Color>
+            <Color x:Key="ColorDisabledDarkDarker">#2A2A2A</Color>
+
             <!-- Brown -->
-            <Color x:Key="ColorLight">#FFEBDA</Color>
+            <!--Color x:Key="ColorLight">#FFEBDA</Color>
             <Color x:Key="ColorLightDarker">#D49A6A</Color>
             <Color x:Key="ColorDarkLighter">#AA6C39</Color>
             <Color x:Key="ColorDark">#804515</Color>
@@ -21,7 +35,7 @@
             <Color x:Key="ColorDisabledLightDarker">#959595</Color>
             <Color x:Key="ColorDisabledDarkLighter">#7F7F7F</Color>
             <Color x:Key="ColorDisabledDark">#696969</Color>
-            <Color x:Key="ColorDisabledDarkDarker">#606060</Color>
+            <Color x:Key="ColorDisabledDarkDarker">#606060</Color-->
 
             <!-- Malachite -->
             <!--Color x:Key="ColorLight">#B2CECE</Color>
