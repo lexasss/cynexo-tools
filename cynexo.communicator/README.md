@@ -1,4 +1,4 @@
-# Cynexo Sniff-0 device controller
+# Cynexo Sniff-0 device communication module
 
 ## Testing
 
