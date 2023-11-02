@@ -26,11 +26,6 @@ public partial class App : Application
         // Force all TextBox's to select its content upon focused
         EventManager.RegisterClassHandler(typeof(TextBox),
             UIElement.GotFocusEvent,
-            new RoutedEventHandler(TextBox_GotFocus));
-    }
-
-    private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        (sender as TextBox)?.SelectAll();
+            new RoutedEventHandler((s, e) => (sender as TextBox)?.SelectAll()));
     }
 }

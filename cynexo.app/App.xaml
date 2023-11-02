@@ -10,7 +10,6 @@
                 <ResourceDictionary Source="Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
             <!-- Each page elements -->
             <Style x:Key="DebugWarning" TargetType="Label">
                 <Setter Property="FontSize" Value="16"/>
@@ -45,9 +44,8 @@
                 <Setter Property="TextAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Padding" Value="0,8" />
-
             </Style>
-            <Style x:Key="Next" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Style x:Key="Next" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                 <Setter Property="HorizontalAlignment" Value="Right"/>
                 <Setter Property="MinWidth" Value="100"/>
                 <Setter Property="MinHeight" Value="32"/>
@@ -57,7 +55,6 @@
                 <Setter Property="HorizontalAlignment" Value="Right"/>
                 <Setter Property="Grid.ColumnSpan" Value="10"/>
             </Style>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>
