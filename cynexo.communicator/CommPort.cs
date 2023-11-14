@@ -131,6 +131,8 @@ public class CommPort
 
     // Internal
 
+    const int READING_PAUSE = 10;   // ms
+
     static CommPort? _instance;
 
     ISerialPort? _port;
@@ -204,11 +206,9 @@ public class CommPort
     /// </summary>
     private void ReadPacketsThread()
     {
-        int PAUSE_INTERVAL = 10;
-
         while (true)
         {
-            try { Thread.Sleep(PAUSE_INTERVAL); }
+            try { Thread.Sleep(READING_PAUSE); }
             catch (ThreadInterruptedException) { break; }  // will exit the loop upon Interrupt is called
 
             if (!IsOpen)

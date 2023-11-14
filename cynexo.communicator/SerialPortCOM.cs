@@ -18,15 +18,14 @@ public class SerialPortCOM : ISerialPort
     {
         _port = new SerialPort(name)
         {
-            StopBits = PORT_STOP_BITS,
-            Parity = PORT_PARITY,
-            BaudRate = PORT_SPEED,
-            DataBits = PORT_DATA_BITS,
+            StopBits = StopBits.One,
+            Parity = Parity.None,
+            BaudRate = 9600,
+            DataBits = 8,
             DtrEnable = true,
             RtsEnable = true,
             DiscardNull = false,
-            WriteTimeout = PORT_WRITE_TIMEOUT,
-            //NewLine = "\r"
+            WriteTimeout = 300, // only for writing.. reading should be able to hand until it returns with some data 
         };
         _port.ErrorReceived += ErrorReceived;
     }
@@ -46,12 +45,6 @@ public class SerialPortCOM : ISerialPort
     public void WriteLine(string text) => _port.Write(text);
 
     // Internal
-
-    const int PORT_SPEED = 9600;
-    const Parity PORT_PARITY = Parity.None;
-    const StopBits PORT_STOP_BITS = StopBits.One;
-    const int PORT_DATA_BITS = 8;
-    const int PORT_WRITE_TIMEOUT = 300;     // only for writing.. reading should be able to hand until it returns with some data 
 
     readonly SerialPort _port;
 }

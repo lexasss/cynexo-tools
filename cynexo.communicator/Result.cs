@@ -28,7 +28,7 @@ public enum Error
 }
 
 /// <summary>
-/// (error, reason) pair used to return from <see cref="CommPort"/> public methods
+/// Operation reslt description used to return from <see cref="CommPort"/> public methods
 /// </summary>
 public class Result
 {
@@ -43,7 +43,7 @@ public class Result
         Reason = reason;
     }
 
-    public static Result OK(string operation) => new Result(operation, Error.Success, "OK");
+    public static Result OK(string operation) => new(operation, Error.Success, "OK");
 
     public override string ToString() => $"{Operation} >> {Error} ({Reason})";
 }

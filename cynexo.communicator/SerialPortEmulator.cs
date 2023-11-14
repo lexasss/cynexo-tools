@@ -10,10 +10,6 @@ public class SerialPortEmulator : ISerialPort
 {
     public bool IsOpen => _isOpen;
 
-    public SerialPortEmulator()
-    {
-    }
-
     public void Open() { _isOpen = true; }
 
     public void Close()
@@ -50,7 +46,7 @@ public class SerialPortEmulator : ISerialPort
     bool _isOpen = false;
     bool _hasResponse = false;
 
-    private string GenerateData()
+    private static string GenerateData()
     {
         return "Some fake data is here";
     }

@@ -121,7 +121,7 @@ public class COMUtils
             System.Diagnostics.Debug.WriteLine("USB ERROR: " + ex.Message);
         }
 
-        return ports?.ToArray() ?? new Port[] { };
+        return ports?.ToArray() ?? Array.Empty<Port>();
     }
 
     private static Port? CreateCOMPort(PropertyDataCollection props)
