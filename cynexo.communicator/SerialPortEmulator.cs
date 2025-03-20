@@ -8,19 +8,19 @@ namespace Cynexo.Communicator;
 /// </summary>
 public class SerialPortEmulator : ISerialPort
 {
-    public bool IsOpen => _isOpen;
+    public bool IsOpen { get; private set; } = false;
 
-    public void Open() { _isOpen = true; }
+    public void Open() { IsOpen = true; }
 
     public void Close()
     {
-        _isOpen = false;
+        IsOpen = false;
         Thread.Sleep(10);
     }
 
     public string ReadLine()
     {
-        while (_isOpen)
+        while (IsOpen)
         {
             Thread.Sleep(10);
             if (_hasResponse)
@@ -43,7 +43,6 @@ public class SerialPortEmulator : ISerialPort
 
     // Internal
 
-    bool _isOpen = false;
     bool _hasResponse = false;
 
     private static string GenerateData()

@@ -136,7 +136,6 @@ public partial class Setup : Page, IPage<Navigation>
 
     private void SetFlow_Click(object sender, RoutedEventArgs e)
     {
-
         var kvs = GetCalibChannels()
             .Where(p => p.Use && p.Flow > 0)
             .Select(p => new KeyValuePair<int, float>(p.Id, p.Flow));
@@ -145,7 +144,7 @@ public partial class Setup : Page, IPage<Navigation>
     }
 
     private void CalibrateManually_Click(object sender, RoutedEventArgs e) =>
-        HandleResponse(_sniff0.Send(Command.SetCAChannel(nudCalibrateManually.Value)));
+        HandleResponse(_sniff0.Send(Command.ManualFlow(nudCalibrateManually.Value)));
 
     private void StopCalibration_Click(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.StopCalibration));
@@ -246,10 +245,6 @@ public partial class Setup : Page, IPage<Navigation>
         }
     }
 
-    private void CalibChannel_Toggled(object sender, RoutedEventArgs e)
-    {
-        btnStartCalibration.IsEnabled = GetCalibChannels()
-            .Where(p => p.Use)
-            .Count() > 0;
-    }
+    private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
+        btnStartCalibration.IsEnabled = GetCalibChannels().Any(p => p.Use);
 }
