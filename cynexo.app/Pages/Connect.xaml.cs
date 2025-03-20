@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -44,13 +45,13 @@ public partial class Connect : Page, IPage<Navigation>
 
     readonly CommPort _sniff0 = CommPort.Instance;
 
-    private static void UpdatePortList(ComboBox cmb)
+    private void UpdatePortList(ComboBox cmb)
     {
         var current = cmb.SelectedValue;
 
         cmb.Items.Clear();
 
-        var availablePorts = System.IO.Ports.SerialPort.GetPortNames();
+        var availablePorts = _usb.Ports.Select(port => port.Name);
         var ports = new HashSet<string>(availablePorts);
         foreach (var port in ports)
         {

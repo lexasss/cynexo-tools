@@ -9,18 +9,20 @@ namespace Cynexo.Communicator;
 /// <summary>
 /// COM port utils: list of available ports, and firing events when this list changes.
 /// </summary>
-public class COMUtils
+public class COMUtils : IDisposable
 {
     /// <summary>
     /// Port descriptor
     /// </summary>
     public class Port
     {
+        public string ID { get; }
         public string Name { get; }
         public string? Description { get; }
         public string? Manufacturer { get; }
-        public Port(string name, string? description, string? manufacturer)
+        public Port(string id, string name, string? description, string? manufacturer)
         {
+            ID = id;
             Name = name;
             Description = description;
             Manufacturer = manufacturer;
@@ -39,12 +41,23 @@ public class COMUtils
     /// <summary>
     /// List of all COM ports in the system
     /// </summary>
-    public static Port[] Ports => _cachedPorts ??= GetAvailableCOMPorts();
+    public Port[] Ports => GetAvailableCOMPorts();
 
     public COMUtils()
     {
-        Listen("__InstanceCreationEvent", "Win32_SerialPort", ActionType.Inserted);
-        Listen("__InstanceDeletionEvent", "Win32_SerialPort", ActionType.Removed);
+        Listen("__InstanceCreationEvent", "Win32_USBControllerDevice", ActionType.Inserted);    // Win32_SerialPort
+        Listen("__InstanceDeletionEvent", "Win32_USBControllerDevice", ActionType.Removed);
+    }
+
+    public void Dispose()
+    {
+        foreach (var watcher in _watchers)
+        {
+            watcher.Stop();
+            watcher.Dispose();
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     // Internal
@@ -55,7 +68,9 @@ public class COMUtils
         Removed
     }
 
-    static Port[]? _cachedPorts = null;
+    readonly List<Port> _cachedPorts = new();
+    
+    readonly List<ManagementEventWatcher> _watchers = new();
 
     private void Listen(string source, string target, ActionType actionType)
     {
@@ -64,37 +79,52 @@ public class COMUtils
 
         watcher.EventArrived += (s, e) =>
         {
-            _cachedPorts = null;
-            Port? port = null;
-
             try
             {
-                var target = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-                port = CreateCOMPort(target.Properties);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("USB ERROR: " + ex.Message);
-            }
-
-            if (port != null)
-            {
+                using var target = (ManagementBaseObject)e.NewEvent["TargetInstance"];
                 switch (actionType)
                 {
                     case ActionType.Inserted:
-                        Inserted?.Invoke(this, port);
+                        var port = CreateCOMPort(target.Properties);
+                        if (port != null)
+                        {
+                            _cachedPorts.Add(port);
+                            Inserted?.Invoke(this, port);
+                        }
                         break;
                     case ActionType.Removed:
-                        Removed?.Invoke(this, port);
+                        var deviceID = GetDeviceID(target.Properties);
+                        if (deviceID != null)
+                        {
+                            var cachedPort = _cachedPorts.FirstOrDefault(port => port.ID == deviceID);
+                            if (cachedPort != null)
+                            {
+                                _cachedPorts.Remove(cachedPort);
+                                Removed?.Invoke(this, cachedPort);
+                            }
+                        }
                         break;
                 }
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[USB] {ex.Message}");
+            }
         };
 
-        watcher.Start();
+        _watchers.Add(watcher);
+
+        try
+        {
+            watcher.Start();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[USB] {ex.Message}");
+        }
     }
 
-    private static Port[] GetAvailableCOMPorts()
+    private Port[] GetAvailableCOMPorts()
     {
         var portNames = SerialPort.GetPortNames();
 
@@ -106,25 +136,35 @@ public class COMUtils
             ManagementBaseObject[]? records = searcher.Get().Cast<ManagementBaseObject>().ToArray();
             ports = records.Select(rec =>
                 {
-                    var name =
-                        portNames.FirstOrDefault(name => rec["Caption"]?.ToString()?.Contains($"({name})") ?? false) ??
+                    var id = rec["DeviceID"]?.ToString();
+                    var name = 
                         portNames.FirstOrDefault(name => rec["DeviceID"]?.ToString()?.Contains($"{name}") ?? false) ??
+                        portNames.FirstOrDefault(name => rec["Caption"]?.ToString()?.Contains($"({name})") ?? false) ??
                         "";
                     var description = rec["Description"]?.ToString();
                     var manufacturer = rec["Manufacturer"]?.ToString();
-                    return new Port(name, description, manufacturer);
+                    return new Port(id ?? "", name ?? id ?? "", description, manufacturer);
                 })
                 .Where(p => p.Name.StartsWith("COM"));
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("USB ERROR: " + ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[USB] {ex.Message}");
+        }
+
+        _cachedPorts.Clear();
+        if (ports != null)
+        {
+            foreach (var port in ports)
+            {
+                _cachedPorts.Add(port);
+            }
         }
 
         return ports?.ToArray() ?? Array.Empty<Port>();
     }
 
-    private static Port? CreateCOMPort(PropertyDataCollection props)
+    private static Port? CreateCOMPort(PropertyDataCollection props, string? deviceName = null)
     {
         string? deviceID = null;
         string? descrition = null;
@@ -144,8 +184,45 @@ public class COMUtils
             {
                 manufacturer = (string?)property.Value;
             }
+            else if (property.Name == "Dependent")  // this handles Win32_USBControllerDevice, as Win32_SerialPort stopped working
+            {
+                var usbControllerID = (string)property.Value;
+                usbControllerID = usbControllerID.Replace("\"", "");
+                var devID = usbControllerID.Split('=')[1];
+                using var searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE DeviceID LIKE '%{devID}%'");
+                ManagementBaseObject[] records = searcher.Get().Cast<ManagementBaseObject>().ToArray();
+                foreach (var rec in records)
+                {
+                    var name = (string?)rec.Properties["Name"]?.Value;
+                    if (name?.Contains("(COM") ?? false)
+                    {
+                        return CreateCOMPort(rec.Properties, name);
+                    }
+                }
+            }
         }
 
-        return deviceID == null ? null : new Port(deviceID, descrition, manufacturer);
+        return deviceID == null ? null : new Port(deviceID, deviceName ?? "COMXX", descrition, manufacturer);
+    }
+
+    private static string? GetDeviceID(PropertyDataCollection props)
+    {
+        string? deviceID = null;
+
+        foreach (PropertyData property in props)
+        {
+            if (property.Name == "DeviceID")
+            {
+                deviceID = (string?)property.Value;
+            }
+            else if (property.Name == "Dependent")  // this handles Win32_USBControllerDevice, as Win32_SerialPort stopped working
+            {
+                var usbControllerID = (string)property.Value;
+                usbControllerID = usbControllerID.Replace("\"", "").Replace(@"\\", @"\");
+                deviceID = usbControllerID.Split('=')[1];
+            }
+        }
+
+        return deviceID;
     }
 }
