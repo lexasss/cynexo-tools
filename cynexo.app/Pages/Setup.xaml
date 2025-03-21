@@ -41,11 +41,6 @@
             <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
 
-        <Style x:Key="ChannelAll" TargetType="{x:Type cntrl:NumericUpDown}" BasedOn="{StaticResource Channel}">
-            <Setter Property="Value" Value="0"/>
-            <Setter Property="MinValue" Value="0"/>
-        </Style>
-
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -114,7 +109,10 @@
                             Unchecked="SetVerboseLCD_Toggled"/>
 
                         <Label Grid.Row="3" Grid.Column="0">Set clear air channel</Label>
-                        <cntrl:NumericUpDown x:Name="nudSetCAChannel" Style="{StaticResource ChannelAll}" Grid.Row="3" Grid.Column="1"/>
+                        <cntrl:NumericUpDown x:Name="nudSetCAChannel" Grid.Row="3" Grid.Column="1"
+                                             Style="{StaticResource Channel}"
+                                             MinValue="1"
+                                             Value="{Binding Path=(local:Command.MaxChannelID), Mode=OneTime}"/>
                         <Button Grid.Row="3" Grid.Column="2"
                             Content="Set"
                             Click="SetCAChannel_Click"/>
@@ -156,6 +154,11 @@
                         <WrapPanel x:Name="wplCalibration" Grid.Row="1" Grid.Column="1">
                             <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
+                                    <CheckBox x:Name="chkCalibChannel0" Content="channel 0" Tag="0"
+                                              Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
+                                    <TextBox x:Name="txbCalibChannel0Flow" Text="1.0" Tag="0"/>
+                                </WrapPanel>
+                                <WrapPanel>
                                     <CheckBox x:Name="chkCalibChannel1" Content="channel 1" Tag="1"
                                               Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel1Flow" Text="1.0" Tag="1"/>
@@ -175,13 +178,13 @@
                                               Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel4Flow" Text="1.0" Tag="4"/>
                                 </WrapPanel>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
                                     <CheckBox x:Name="chkCalibChannel5" Content="channel 5" Tag="5"
                                               Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>
                                     <TextBox x:Name="txbCalibChannel5Flow" Text="1.0" Tag="5"/>
                                 </WrapPanel>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,20,0">
                                 <WrapPanel>
                                     <CheckBox x:Name="chkCalibChannel6" Content="channel 6" Tag="6"
                                               Checked="CalibChannel_Toggled" Unchecked="CalibChannel_Toggled"/>

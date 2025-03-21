@@ -8,7 +8,7 @@ namespace Cynexo.Communicator;
 /// </summary>
 public static class Command
 {
-    public static int MinChannelID => 1;
+    public static int MinChannelID => 0;
     public static int MaxChannelID => 13;
 
 
