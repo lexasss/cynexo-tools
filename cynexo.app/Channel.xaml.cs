@@ -8,12 +8,13 @@ public enum ChannelOperationState
 {
     Initial,
     Calibrating,
-    Calibrated
+    Calibrated,
+    Flowing
 }
 
 public partial class Channel : UserControl, INotifyPropertyChanged
 {
-    public int ID 
+    public int ID
     { 
         get => field;
         set
@@ -34,15 +35,19 @@ public partial class Channel : UserControl, INotifyPropertyChanged
         }
     }
 
-    public double Flow
+    public string FlowString
     {
         get => field;
         set
         {
             field = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Flow)));
+            if (double.TryParse(value, out double flow) && flow == 0)
+            {
+                IsActive = false;
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FlowString)));
         }
-    }
+    } = "0";
 
     public ChannelOperationState State
     {
@@ -50,14 +55,29 @@ public partial class Channel : UserControl, INotifyPropertyChanged
         set
         {
             field = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsReadyMarkVisible)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsInProcessAnimationVisible)));
+
+            if (value == ChannelOperationState.Calibrated)
+            {
+                IsCalibrated = true;
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibratedAndClosed)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibrating)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFlowing)));
         }
     }
 
-    public bool IsReadyMarkVisible => State == ChannelOperationState.Calibrated;
-    public bool IsInProcessAnimationVisible => State == ChannelOperationState.Calibrating;
+    public double Flow
+    {
+        get => double.Parse(FlowString);
+        set => FlowString = value.ToString();
+    }
+
+    public bool IsCalibrated { get; private set; }
+
+    public bool IsCalibrating => State == ChannelOperationState.Calibrating;
+    public bool IsCalibratedAndClosed => State == ChannelOperationState.Calibrated;
+    public bool IsFlowing => State == ChannelOperationState.Flowing;
 
 
     public event EventHandler<bool>? ActivityChanged;

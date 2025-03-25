@@ -33,15 +33,19 @@ _com.Inserted += (s, e) => Dispatcher.CurrentDispatcher.Invoke(() =>
 });
 
 Console.WriteLine("Available ports:");
-var ports = COMUtils.Ports;
-if (ports.Length == 0)
+using (var utils = new COMUtils())
 {
-    Console.WriteLine("  none");
-}
-else foreach (var port in ports)
+    var ports = utils.Ports;
+    if (ports.Length == 0)
     {
-        Console.WriteLine($"  {port.Name} ({port.Description}; {port.Manufacturer})");
+        Console.WriteLine("  none");
     }
+    else foreach (var port in ports)
+        {
+            Console.WriteLine($"  {port.Name} ({port.Description}; {port.Manufacturer})");
+        }
+}
+
 Console.WriteLine("");
 
 

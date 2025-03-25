@@ -7,7 +7,7 @@
   
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <RootNamespace>Cynexo.App</RootNamespace>
@@ -18,7 +18,7 @@
     <Description>Cynexo UI application</Description>
     <PackageIcon>main.png</PackageIcon>
     <PackageVersion>2.0</PackageVersion>
-    <Copyright>(c) 2023</Copyright>
+    <Copyright>(c) 2025</Copyright>
     <ApplicationIcon>Assets\icons\main.ico</ApplicationIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <AssemblyVersion>1.0.4.0</AssemblyVersion>
@@ -28,7 +28,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Prefer32Bit>true</Prefer32Bit>
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <NoWarn>1701;1702</NoWarn>
@@ -37,11 +36,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702;IDE0040</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Assets\images\done.png" />
-    <None Remove="Assets\images\wait.gif" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dirkster.NumericUpDownLib" Version="3.4.0" />
@@ -60,27 +54,9 @@
     <Resource Include="Assets\images\information.png" />
     <Resource Include="Assets\images\question.png" />
     <Resource Include="Assets\images\wait.gif" />
+    <Resource Include="Assets\images\wind.gif" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Pages\Connect.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Pages\Setup.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
+  
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -102,6 +78,27 @@
     </None>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Compile Update="Pages\Connect.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Pages\Setup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+
   <ItemGroup>
     <Page Update="Pages\Connect.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -112,5 +109,4 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-
 </Project>

@@ -567,9 +567,17 @@
                             Click="HLCalibrate_Click"/>
                     <Button Style="{StaticResource Wide}"
                             IsEnabled="{Binding CanProceed}"
-                            Content="Open"
+                            Content="Toggle valves"
                             Click="HLStartStop_Click"/>
                 </WrapPanel>
+
+                <Separator/>
+                
+                <StackPanel>
+                    <CheckBox Content="Verbose"
+                              Height="26"
+                              IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
 

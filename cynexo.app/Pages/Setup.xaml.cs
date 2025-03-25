@@ -281,6 +281,9 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
         }
     }
 
+    private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
+        btnStartCalibration.IsEnabled = GetCalibChannels().Any(p => p.Use);
+
     private void HLCalibrate_Click(object sender, RoutedEventArgs e)
     {
         _controller.Calibrate();
@@ -290,7 +293,4 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     {
         _controller.Toggle();
     }
-
-    private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
-        btnStartCalibration.IsEnabled = GetCalibChannels().Any(p => p.Use);
 }

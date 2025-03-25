@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Cynexo.Communicator;
 
 /// <summary>
-/// This class is used to emulate communication with the device via <see cref="CommPort"/>
+/// Emulates communication with the device via <see cref="CommPort"/>
 /// </summary>
 public class SerialPortEmulator : ISerialPort
 {
@@ -28,7 +28,12 @@ public class SerialPortEmulator : ISerialPort
             {
                 var response = _response;
                 _response = null;
-                return response;
+
+                //if (_isVerbose || _isResponseData)
+                {
+                    _isResponseData = false;
+                    return response;
+                }
             }
         }
 
@@ -37,18 +42,40 @@ public class SerialPortEmulator : ISerialPort
 
     public void WriteLine(string text)
     {
+        text = text.Trim();
+
         if (text.StartsWith("setVerbose"))
         {
-            _response = "Verbose mode " + (text.Split(' ')[1] == "1" ? "ON" : "OFF");
+            _isVerbose = int.Parse(text.Split(' ')[1]) == 1;
+            _isResponseData = true;
+            _response = _isVerbose ?
+                "Verbose mode ON" :
+                "recived command setVerbose";
         }
         else if (text.StartsWith("readFlow"))
         {
-            _response = GenerateData();
+            _isResponseData = true;
+            _response = $"Flow: {_flows[_currentChannelIndex]:F5}";
         }
         else if (text.StartsWith("setFlow"))
         {
             _response = "--> setFlow";
-            Task.Run(() => RespondToSetFlow(text.Split(' ')[1]));
+            _ = RespondToSetFlow(text.Split(' ')[1]);
+        }
+        else if (text.StartsWith("stopCalibration"))
+        {
+            _response = "recived command stopCalibration";
+            _hasInterruptionRequest = true;
+        }
+        else if (text.StartsWith("setChannel"))
+        {
+            _response = "--> setChannel";
+            RespondToSetChannel(text.Split(' ')[1]);
+        }
+        else if (text.StartsWith("setValve"))
+        {
+            _response = "--> setValve";
+            RespondToSetValve(text.Split(' ')[1]);
         }
     }
 
@@ -56,20 +83,25 @@ public class SerialPortEmulator : ISerialPort
 
     string? _response = null;
 
-    private static string GenerateData()
-    {
-        return "Some fake data is here";
-    }
+    bool _hasInterruptionRequest = false;
 
-    private static class Random
+    readonly double[] _flows = new double[14] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    int _currentChannelIndex = 0;
+    bool _isVerbose = false;
+    bool _isResponseData = false;   // set it to true if the response must be captured regardless of the verbosity status
+
+    /*private static class Random
     {
         public static float Range(float pm) => (float)((_random.NextDouble() - 0.5) * 2 * pm);
 
         static readonly System.Random _random = new();
-    }
+    }*/
 
     private async Task RespondToSetFlow(string parameters)
     {
+        _hasInterruptionRequest = false;
+
         await Task.Delay(100);
         _response = $"parameters={parameters}";
 
@@ -93,23 +125,29 @@ public class SerialPortEmulator : ISerialPort
             await Task.Delay(100);
             _response = $"target = {flow:F2}";
 
-            await Task.Delay(100);
-            _response = $"measured = {flow + 0.4:F2}";
+            await Task.Delay(500);
+            _response = $"measured = {realFlow:F2}";
 
             await Task.Delay(100);
             _response = $"checking flow {id}";
 
-            realFlow -= 0.15;
-
-            await Task.Delay(100);
-            _response = $"Target Flow {flow:F2}";
-
-            await Task.Delay(500);
-            _response = $"Measured Flow {realFlow:F2}";
-
-            while (Math.Abs(realFlow - flow) >= 0.1)
+            while (!_hasInterruptionRequest)
             {
                 realFlow -= 0.15;
+
+                await Task.Delay(100);
+                _response = $"Target Flow {flow:F2}";
+
+                await Task.Delay(500);
+                _response = $"Measured Flow {realFlow:F2}";
+
+                if (Math.Abs(realFlow - flow) < 0.1)
+                {
+                    await Task.Delay(100);
+                    _response = "Value in range";
+
+                    break;
+                }
 
                 await Task.Delay(100);
                 _response = $"Steps to move {Math.Abs(realFlow - flow) * 100:F0}";
@@ -122,19 +160,35 @@ public class SerialPortEmulator : ISerialPort
 
                 await Task.Delay(500);
                 _response = "stop move";
-
-                await Task.Delay(100);
-                _response = $"Target Flow {flow:F2}";
-
-                await Task.Delay(500);
-                _response = $"Measured Flow {realFlow:F2}";
             }
 
             await Task.Delay(100);
-            _response = "Value in range";
+            _response = $"Checking Stability ch. {id}";
 
             await Task.Delay(100);
-            _response = $"Checking Stability ch. {id}";
+            _response = $"target: {flow}";
+
+            _flows[id] = realFlow;
+
+            if (_hasInterruptionRequest)
+                break;
         }
+    }
+
+    private void RespondToSetChannel(string id)
+    {
+        _currentChannelIndex = int.Parse(id);
+
+        Thread.Sleep(50);
+        _response = $"channel={id}";
+    }
+
+    private void RespondToSetValve(string state)
+    {
+        Thread.Sleep(50);
+        _response = $"valve state = {state}";
+
+        Thread.Sleep(50);
+        _response = state == "0" ? "Close" : "Open";
     }
 }

@@ -26,16 +26,19 @@
     <WrapPanel Margin="0,2,8,2">
         <Grid>
             <Image Style="{StaticResource Status}"
-                   Visibility="{Binding IsReadyMarkVisible, Converter={StaticResource bool2vis}}"
+                   Visibility="{Binding IsCalibratedAndClosed, Converter={StaticResource bool2vis}}"
                    Source="/Assets/images/done.png"/>
             <Image Style="{StaticResource Status}"
-                   Visibility="{Binding IsInProcessAnimationVisible, Converter={StaticResource bool2vis}}"
+                   Visibility="{Binding IsCalibrating, Converter={StaticResource bool2vis}}"
                    gif:ImageBehavior.AnimatedSource="/Assets/images/wait.gif"/>
+            <Image Style="{StaticResource Status}"
+                   Visibility="{Binding IsFlowing, Converter={StaticResource bool2vis}}"
+                   gif:ImageBehavior.AnimatedSource="/Assets/images/wind.gif"/>
         </Grid>
         <WrapPanel>
             <CheckBox Content="{Binding ID}"
                       IsChecked="{Binding IsActive, Mode=TwoWay}"/>
-            <TextBox Text="{Binding Flow, Mode=TwoWay}"/>
+            <TextBox Text="{Binding FlowString, Mode=TwoWay}"/>
         </WrapPanel>
     </WrapPanel>
 </UserControl>

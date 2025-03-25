@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Cynexo.App;
@@ -19,6 +20,17 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         }
     } = false;
 
+    public bool IsVerbose
+    {
+        get => field;
+        set
+        {
+            field = value;
+            _sniff0.Send(Command.SetVerbose(value));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsVerbose)));
+        }
+    }
+
     public bool CanProceed => _channelControls.Any(c => c.IsActive);
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -27,6 +39,8 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     {
         _sniff0 = port;
         _channelControls = channelControls;
+
+        LoadState();
 
         foreach (var channelControl in channelControls)
         {
@@ -42,6 +56,8 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     public void Dispose()
     {
         _sniff0.Data -= OnData;
+
+        SaveState();
 
         GC.SuppressFinalize(this);
     }
@@ -97,17 +113,18 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     {
         IsBusy = true;
 
-        _isFlowing = !_isFlowing;
+        var channels = _channelControls.Where(ch => ch.IsActive).ToArray();
 
-        foreach (var channel in _channelControls)
+        foreach (var channel in channels)
         {
-            channel.State = ChannelOperationState.Initial;
+            channel.State = !channel.IsFlowing ? ChannelOperationState.Flowing :
+                (channel.IsCalibrated ? ChannelOperationState.Calibrated : ChannelOperationState.Initial);
 
             await Task.Delay(100);
             _sniff0.Send(Command.SetChannel(channel.ID));
 
             await Task.Delay(100);
-            _sniff0.Send(Command.SetValve(_isFlowing));
+            _sniff0.Send(Command.SetValve(channel.IsFlowing));
         }
 
         IsBusy = false;
@@ -122,6 +139,8 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         ChannelReady,
     }
 
+    record class ChannelState(bool IsActive, double Flow);
+
     readonly Dictionary<AwaitingActions, string> Actions = new()
     {
         { AwaitingActions.None, "" },
@@ -134,7 +153,6 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
     AwaitingActions _awaitedAction = AwaitingActions.None;
     bool _hasResponse = false;
-    bool _isFlowing = false;
 
     private async void OnData(object? sender, string data)
     {
@@ -145,5 +163,33 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
                 _hasResponse = true;
             }
         });
+    }
+
+    private void LoadState()
+    {
+        var flowsJson = Properties.Settings.Default.Controller_Flows;
+        if (!string.IsNullOrEmpty(flowsJson))
+        {
+            try
+            {
+                var flows = JsonSerializer.Deserialize<ChannelState[]>(flowsJson) ?? [];
+                for (int i = 0; i < flows.Length && i < _channelControls.Length; i++)
+                {
+                    _channelControls[i].IsActive = flows[i].IsActive;
+                    _channelControls[i].Flow = flows[i].Flow;
+                }
+            }
+            catch { }
+        }
+    }
+
+    private void SaveState()
+    {
+        var flows = _channelControls.Select(ch => new ChannelState(ch.IsActive, ch.Flow)).ToArray();
+        var flowsJson = JsonSerializer.Serialize(flows);
+
+        var settings = Properties.Settings.Default;
+        settings.Controller_Flows = flowsJson;
+        settings.Save();
     }
 }
