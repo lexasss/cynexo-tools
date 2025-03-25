@@ -1,7 +1,6 @@
 ﻿using Cynexo.Communicator;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,7 +12,6 @@ namespace Cynexo.App.Pages;
 public partial class Connect : Page, IPage<Navigation>
 {
     public event EventHandler<Navigation>? Next;
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     public Connect()
     {

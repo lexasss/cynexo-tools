@@ -3,16 +3,23 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Cynexo.Communicator;assembly=Cynexo.Communicator" 
+      xmlns:utils="clr-namespace:Cynexo.App.Utils" 
+      xmlns:local="clr-namespace:Cynexo.App" 
+      xmlns:comm="clr-namespace:Cynexo.Communicator;assembly=Cynexo.Communicator" 
       xmlns:cntrl="clr-namespace:NumericUpDownLib;assembly=NumericUpDownLib"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="1000"
+      d:DesignHeight="500"
+      d:DesignWidth="1000"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
       Title="Controller"
       Focusable="True"
       Loaded="Page_Loaded"
       Unloaded="Page_Unloaded">
 
     <Page.Resources>
+        <utils:BoolToVisibilityConverter x:Key="bool2vis"/>
+        <utils:BoolInverseConverter x:Key="inverse"/>
+
         <Style TargetType="{x:Type Label}">
             <Setter Property="Padding" Value="4,2,8,2"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -35,14 +42,18 @@
         <Style x:Key="Channel" TargetType="{x:Type cntrl:NumericUpDown}" BasedOn="{StaticResource {x:Type cntrl:NumericUpDown}}">
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Value" Value="{Binding Path=(local:Command.MinChannelID), Mode=OneTime}"/>
-            <Setter Property="MaxValue" Value="{Binding Path=(local:Command.MaxChannelID), Mode=OneTime}"/>
-            <Setter Property="MinValue" Value="{Binding Path=(local:Command.MinChannelID), Mode=OneTime}"/>
+            <Setter Property="Value" Value="{Binding Path=(comm:Command.MinChannelID), Mode=OneTime}"/>
+            <Setter Property="MaxValue" Value="{Binding Path=(comm:Command.MaxChannelID), Mode=OneTime}"/>
+            <Setter Property="MinValue" Value="{Binding Path=(comm:Command.MinChannelID), Mode=OneTime}"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
 
         <Style TargetType="{x:Type WrapPanel}">
             <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="Wide" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="MinWidth" Value="120"/>
         </Style>
 
     </Page.Resources>
@@ -63,19 +74,33 @@
                    Margin="0,0,0,12"/>
 
         <Grid Grid.Row="1" Margin="8,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="686"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="txbResponses" Grid.Column="0"
+            <TextBox x:Name="txbResponses" Grid.Column="0" Grid.RowSpan="2"
                      IsReadOnly="True"
                      BorderThickness="1"
                      VerticalContentAlignment="Top"
                      HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Visible"/>
 
-            <TabControl Grid.Column="1" Margin="8,0,0,0" Padding="0,0,4,0">
+            <CheckBox x:Name="chkMode" Grid.Row="0" Grid.Column="1"
+                      Style="{StaticResource Switch}"
+                      Margin="8"
+                      Tag="API"
+                      IsChecked="True"
+                      Content="High-level"
+                      HorizontalAlignment="Center"/>
+            <TabControl Grid.Row="1" Grid.Column="1"
+                        Margin="8,0,0,0"
+                        Padding="0,0,4,0"
+                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}, ConverterParameter=True}">
                 <TabItem Header="General">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -112,7 +137,7 @@
                         <cntrl:NumericUpDown x:Name="nudSetCAChannel" Grid.Row="3" Grid.Column="1"
                                              Style="{StaticResource Channel}"
                                              MinValue="1"
-                                             Value="{Binding Path=(local:Command.MaxChannelID), Mode=OneTime}"/>
+                                             Value="{Binding Path=(comm:Command.MaxChannelID), Mode=OneTime}"/>
                         <Button Grid.Row="3" Grid.Column="2"
                             Content="Set"
                             Click="SetCAChannel_Click"/>
@@ -502,6 +527,50 @@
                     </Grid>
                 </TabItem>
             </TabControl>
+
+            <StackPanel x:Name="stpHighLevel" Grid.Row="1" Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        DataContext="{Binding HighLevelController}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource inverse}}"
+                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}">
+                <Label Margin="0,0,0,4"
+                       HorizontalAlignment="Center"
+                       Content="Channels"/>
+                <WrapPanel x:Name="wplChannels" Grid.Row="1" Grid.Column="1">
+                    <StackPanel Margin="0,0,20,0">
+                        <local:Channel ID="0"/>
+                        <local:Channel ID="1"/>
+                        <local:Channel ID="2"/>
+                        <local:Channel ID="3"/>
+                        <local:Channel ID="4"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,20,0">
+                        <local:Channel ID="5"/>
+                        <local:Channel ID="6"/>
+                        <local:Channel ID="7"/>
+                        <local:Channel ID="8"/>
+                        <local:Channel ID="9"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <local:Channel ID="10"/>
+                        <local:Channel ID="11"/>
+                        <local:Channel ID="12"/>
+                        <local:Channel ID="13"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <WrapPanel Margin="4,8"
+                           HorizontalAlignment="Center">
+                    <Button Style="{StaticResource Wide}"
+                            IsEnabled="{Binding CanProceed}"
+                            Content="Calibrate"
+                            Click="HLCalibrate_Click"/>
+                    <Button Style="{StaticResource Wide}"
+                            IsEnabled="{Binding CanProceed}"
+                            Content="Open"
+                            Click="HLStartStop_Click"/>
+                </WrapPanel>
+            </StackPanel>
         </Grid>
 
         <WrapPanel Grid.Row="2"

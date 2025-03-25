@@ -31,13 +31,19 @@ public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return (bool)value ? Visibility.Visible : Visibility.Hidden;
+        bool isInverted = parameter != null;
+        return (bool)value ?
+            (isInverted ? Visibility.Hidden : Visibility.Visible) : 
+            (isInverted ? Visibility.Visible : Visibility.Hidden);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        bool isInverted = parameter != null;
         var visibility = (Visibility)value;
-        return visibility == Visibility.Visible;
+        return isInverted ?
+            visibility != Visibility.Visible :
+            visibility == Visibility.Visible;
     }
 }
 
@@ -51,6 +57,19 @@ public class ObjectToBoolConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
+    }
+}
+
+public class BoolInverseConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return !(bool)value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return !(bool)value;
     }
 }
 

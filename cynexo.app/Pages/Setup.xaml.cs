@@ -1,6 +1,7 @@
 ﻿using Cynexo.Communicator;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,15 +9,24 @@ using System.Windows.Controls;
 
 namespace Cynexo.App.Pages;
 
-public partial class Setup : Page, IPage<Navigation>
+public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 {
+    public HighLevelController HighLevelController => _controller;
+
     public event EventHandler<Navigation>? Next;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public Setup()
     {
         InitializeComponent();
 
-        DataContext = this;
+        _controller = new HighLevelController(_sniff0, GetHLChannels());
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighLevelController)));
+
+        App.Current.Exit += (s, e) =>
+        {
+            _controller.Dispose();
+        };
     }
 
     // Internal
@@ -25,6 +35,32 @@ public partial class Setup : Page, IPage<Navigation>
 
     readonly Storage _storage = Storage.Instance;
     readonly CommPort _sniff0 = CommPort.Instance;
+
+    readonly HighLevelController _controller;
+
+    private Channel[] GetHLChannels()
+    {
+        var result = new List<Channel>();
+
+        void AddFrom(UIElementCollection elements)
+        {
+            foreach (UIElement el in elements)
+            {
+                if (el is Channel channel)
+                {
+                    result.Add(channel);
+                }
+                else if (el is Panel panel)
+                {
+                    AddFrom(panel.Children);
+                }
+            }
+        }
+
+        AddFrom(wplChannels.Children);
+
+        return result.ToArray();
+    }
 
     private ChannelCalibration[] GetCalibChannels()
     {
@@ -243,6 +279,16 @@ public partial class Setup : Page, IPage<Navigation>
                 HandleResponse(_sniff0.Send(Command.OpenValveThenSound(channel, duration, delay, chkOpenValveSoundSecondTrigger.IsChecked == true)));
             }
         }
+    }
+
+    private void HLCalibrate_Click(object sender, RoutedEventArgs e)
+    {
+        _controller.Calibrate();
+    }
+
+    private void HLStartStop_Click(object sender, RoutedEventArgs e)
+    {
+        _controller.Toggle();
     }
 
     private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
