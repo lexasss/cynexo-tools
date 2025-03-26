@@ -33,7 +33,7 @@
                    gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/wait.gif"/>
             <Image Style="{StaticResource Status}"
                    Visibility="{Binding IsFlowing, Converter={StaticResource bool2vis}}"
-                   gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/pulse-ring.gif"/>
+                   gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/pulse.gif"/>
         </Grid>
         <WrapPanel>
             <CheckBox Content="{Binding ID}"

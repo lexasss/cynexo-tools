@@ -52,7 +52,7 @@
     <Resource Include="Assets\images\error.png" />
     <Resource Include="Assets\images\exclamation.png" />
     <Resource Include="Assets\images\information.png" />
-    <Resource Include="Assets\images\pulse-ring.gif" />
+    <Resource Include="Assets\images\pulse.gif" />
     <Resource Include="Assets\images\question.png" />
     <Resource Include="Assets\images\wait.gif" />
   </ItemGroup>
