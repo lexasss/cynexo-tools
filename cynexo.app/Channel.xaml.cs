@@ -15,7 +15,7 @@ public enum ChannelOperationState
 public partial class Channel : UserControl, INotifyPropertyChanged
 {
     public int ID
-    { 
+    {
         get => field;
         set
         {
@@ -35,49 +35,25 @@ public partial class Channel : UserControl, INotifyPropertyChanged
         }
     }
 
-    public string FlowString
+    public double Flow
     {
         get => field;
         set
         {
             field = value;
-            if (double.TryParse(value, out double flow) && flow == 0)
+            if (value == 0)
             {
                 IsActive = false;
             }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FlowString)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Flow)));
         }
-    } = "0";
-
-    public ChannelOperationState State
-    {
-        get => field;
-        set
-        {
-            field = value;
-
-            if (value == ChannelOperationState.Calibrated)
-            {
-                IsCalibrated = true;
-            }
-
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibratedAndClosed)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibrating)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFlowing)));
-        }
-    }
-
-    public double Flow
-    {
-        get => double.Parse(FlowString);
-        set => FlowString = value.ToString();
     }
 
     public bool IsCalibrated { get; private set; }
 
-    public bool IsCalibrating => State == ChannelOperationState.Calibrating;
-    public bool IsCalibratedAndClosed => State == ChannelOperationState.Calibrated;
-    public bool IsFlowing => State == ChannelOperationState.Flowing;
+    public bool IsCalibrating => _state == ChannelOperationState.Calibrating;
+    public bool IsCalibratedAndClosed => _state == ChannelOperationState.Calibrated;
+    public bool IsOpen => _state == ChannelOperationState.Flowing;
 
 
     public event EventHandler<bool>? ActivityChanged;
@@ -88,4 +64,29 @@ public partial class Channel : UserControl, INotifyPropertyChanged
     {
         InitializeComponent();
     }
+
+    public void SetState(ChannelOperationState state)
+    {
+        _state = state;
+
+        if (state == ChannelOperationState.Calibrated)
+        {
+            IsCalibrated = true;
+        }
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibratedAndClosed)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibrating)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsOpen)));
+    }
+
+    public void ToggleFlowState() => SetState(
+        !IsOpen ?
+            ChannelOperationState.Flowing :
+            IsCalibrated ?
+                ChannelOperationState.Calibrated :
+                ChannelOperationState.Initial);
+
+    // Internal
+
+    ChannelOperationState _state = ChannelOperationState.Initial;
 }

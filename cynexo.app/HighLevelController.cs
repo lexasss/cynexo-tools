@@ -68,7 +68,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         foreach (var channel in _channelControls)
         {
-            channel.State = ChannelOperationState.Initial;
+            channel.SetState(ChannelOperationState.Initial);
         }
 
         var channels = _channelControls.Where(ch => ch.IsActive && ch.Flow > 0).ToArray();
@@ -90,12 +90,12 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
                 {
                     if (_awaitedAction == AwaitingActions.SelectChannel)
                     {
-                        channels[channelIndex].State = ChannelOperationState.Calibrating;
+                        channels[channelIndex].SetState(ChannelOperationState.Calibrating);
                         _awaitedAction = AwaitingActions.ChannelReady;
                     }
                     else if (_awaitedAction == AwaitingActions.ChannelReady)
                     {
-                        channels[channelIndex].State = ChannelOperationState.Calibrated;
+                        channels[channelIndex].SetState(ChannelOperationState.Calibrated);
 
                         channelIndex += 1;
                         _awaitedAction = channelIndex < channels.Length ? AwaitingActions.SelectChannel : AwaitingActions.None;
@@ -117,14 +117,43 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         foreach (var channel in channels)
         {
-            channel.State = !channel.IsFlowing ? ChannelOperationState.Flowing :
-                (channel.IsCalibrated ? ChannelOperationState.Calibrated : ChannelOperationState.Initial);
+            channel.ToggleFlowState();
 
             await Task.Delay(100);
             _sniff0.Send(Command.SetChannel(channel.ID));
 
             await Task.Delay(100);
-            _sniff0.Send(Command.SetValve(channel.IsFlowing));
+            _sniff0.Send(Command.SetValve(channel.IsOpen));
+        }
+
+        IsBusy = false;
+    }
+
+    public async void OpenFor(int ms)
+    {
+        IsBusy = true;
+
+        var channels = _channelControls.Where(ch => ch.IsActive).ToArray();
+
+        int additionalTimeMs = (channels.Length - 1) * 200;
+        foreach (var channel in channels)
+        {
+            channel.ToggleFlowState();
+
+            await Task.Delay(100);
+            _sniff0.Send(Command.SetChannel(channel.ID));
+
+            await Task.Delay(100);
+            _sniff0.Send(Command.OpenValve(ms + additionalTimeMs));
+
+            additionalTimeMs -= 200;
+        }
+
+        await Task.Delay(ms);
+
+        foreach (var channel in channels)
+        {
+            channel.ToggleFlowState();
         }
 
         IsBusy = false;

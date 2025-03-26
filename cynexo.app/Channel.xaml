@@ -15,7 +15,7 @@
         <utils:BoolToVisibilityConverter x:Key="bool2vis"/>
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="MinWidth" Value="42"/>
+            <Setter Property="MinWidth" Value="32"/>
         </Style>
         <Style x:Key="Status" TargetType="{x:Type Image}">
             <Setter Property="Width" Value="16"/>
@@ -32,13 +32,13 @@
                    Visibility="{Binding IsCalibrating, Converter={StaticResource bool2vis}}"
                    gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/wait.gif"/>
             <Image Style="{StaticResource Status}"
-                   Visibility="{Binding IsFlowing, Converter={StaticResource bool2vis}}"
+                   Visibility="{Binding IsOpen, Converter={StaticResource bool2vis}}"
                    gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/pulse.gif"/>
         </Grid>
         <WrapPanel>
             <CheckBox Content="{Binding ID}"
                       IsChecked="{Binding IsActive, Mode=TwoWay}"/>
-            <TextBox Text="{Binding FlowString, Mode=TwoWay}"/>
+            <TextBox Text="{Binding Flow, Mode=TwoWay}"/>
         </WrapPanel>
     </WrapPanel>
 </UserControl>

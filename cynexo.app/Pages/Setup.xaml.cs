@@ -291,6 +291,16 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private void HLStartStop_Click(object sender, RoutedEventArgs e)
     {
-        _controller.Toggle();
+        if (chkUseTimer.IsChecked == true)
+        {
+            if (int.TryParse(txbTimerInterval.Text, out int ms))
+            {
+                _controller.OpenFor(ms);
+            }
+        }
+        else
+        {
+            _controller.Toggle();
+        }
     }
 }

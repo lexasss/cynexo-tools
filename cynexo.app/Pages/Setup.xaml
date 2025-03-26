@@ -96,7 +96,8 @@
                       Tag="API"
                       IsChecked="True"
                       Content="High-level"
-                      HorizontalAlignment="Center"/>
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Center"/>
             <TabControl Grid.Row="1" Grid.Column="1"
                         Margin="8,0,0,0"
                         Padding="0,0,4,0"
@@ -559,17 +560,30 @@
                     </StackPanel>
                 </WrapPanel>
 
-                <WrapPanel Margin="4,8"
-                           HorizontalAlignment="Center">
+                <UniformGrid Margin="0,12,0,0"
+                             HorizontalAlignment="Center"
+                             Rows="2"
+                             Columns="2">
                     <Button Style="{StaticResource Wide}"
-                            IsEnabled="{Binding CanProceed}"
-                            Content="Calibrate"
-                            Click="HLCalibrate_Click"/>
+                        IsEnabled="{Binding CanProceed}"
+                        Content="Calibrate"
+                        Click="HLCalibrate_Click"/>
                     <Button Style="{StaticResource Wide}"
-                            IsEnabled="{Binding CanProceed}"
-                            Content="Toggle valves"
-                            Click="HLStartStop_Click"/>
-                </WrapPanel>
+                        IsEnabled="{Binding CanProceed}"
+                        Content="Toggle valves"
+                        Click="HLStartStop_Click"/>
+                    <Label/>
+                    <WrapPanel>
+                        <CheckBox x:Name="chkUseTimer"
+                                  Height="24"
+                                  Content="for"/>
+                        <WrapPanel IsEnabled="{Binding ElementName=chkUseTimer, Path=IsChecked}">
+                            <TextBox x:Name="txbTimerInterval"
+                                     Text="1000"/>
+                            <Label Content="ms"/>
+                        </WrapPanel>
+                    </WrapPanel>
+                </UniformGrid>
 
                 <Separator/>
                 
