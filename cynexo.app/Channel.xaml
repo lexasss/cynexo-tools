@@ -30,10 +30,10 @@
                    Source="/Assets/images/done.png"/>
             <Image Style="{StaticResource Status}"
                    Visibility="{Binding IsCalibrating, Converter={StaticResource bool2vis}}"
-                   gif:ImageBehavior.AnimatedSource="/Assets/images/wait.gif"/>
+                   gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/wait.gif"/>
             <Image Style="{StaticResource Status}"
                    Visibility="{Binding IsFlowing, Converter={StaticResource bool2vis}}"
-                   gif:ImageBehavior.AnimatedSource="/Assets/images/wind.gif"/>
+                   gif:ImageBehavior.AnimatedSource="/Cynexo.App;component/Assets/images/pulse-ring.gif"/>
         </Grid>
         <WrapPanel>
             <CheckBox Content="{Binding ID}"
