@@ -83,10 +83,9 @@
 
         <TextBlock Grid.Row="0"
                    Style="{StaticResource PageTitle}"
-                   Text="Sniff-0"
-                   Margin="0,0,0,12"/>
+                   Text="Sniff-0"/>
 
-        <Grid Grid.Row="1" Margin="8,0">
+        <Grid Grid.Row="1" Margin="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
@@ -607,7 +606,7 @@
                                 <Label Content="ms"/>
                                 <Image Source="/Assets/images/exclamation.png"
                                        Height="16"
-                                       ToolTip="The valves will be opened one by one"
+                                       ToolTip="The selected channels will be activated one by one and only one valve will be opened at a time."
                                        ToolTipService.InitialShowDelay="0"/>
                             </WrapPanel>
                         </WrapPanel>
@@ -616,20 +615,22 @@
                     <Separator/>
                     
                     <WrapPanel HorizontalAlignment="Center">
-                        <Label Margin="24,0,0,0">Flow:</Label>
-                        <Label x:Name="lblFlow"/>
+                        <Label Margin="24,0,0,0">Flow: </Label>
+                        <Label x:Name="lblFlow"
+                               FontFamily="Consolas"
+                               Content="0.00"/>
                     </WrapPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>
 
-        <WrapPanel Grid.Row="2"
+        <!--WrapPanel Grid.Row="2"
                    HorizontalAlignment="Center">
             <Button x:Name="btnClose"
                     Style="{StaticResource Next}"
                     Content="Close"
                     Click="Close_Click"/>
-        </WrapPanel>
+        </WrapPanel-->
 
         <Label x:Name="lblZoom" Style="{StaticResource ZoomIndicator}"/>
         <Label x:Name="lblDebug" Style="{StaticResource DebugWarning}" Visibility="Collapsed"/>

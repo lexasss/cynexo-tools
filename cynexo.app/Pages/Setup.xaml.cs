@@ -20,12 +20,12 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     {
         InitializeComponent();
 
-        _controller = new HighLevelController(_sniff0, GetHLChannels());
+        _controller = new HighLevelController(_sniff0, GetHighLevelChannels());
         _controller.FlowMeasured += (s, e) => Dispatcher.Invoke(() => {
             if (double.TryParse(e, out double flow))
                 lblFlow.Content = $"{flow:F2}";
             else
-                lblFlow.Content = null;
+                lblFlow.Content = "0.00";
         });
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighLevelController)));
@@ -45,7 +45,7 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     readonly HighLevelController _controller;
 
-    private Channel[] GetHLChannels()
+    private Channel[] GetHighLevelChannels()
     {
         var result = new List<Channel>();
 
@@ -157,8 +157,8 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
             .UnbindVisibilityToDebug(lblDebug);
     }
 
-    private void Close_Click(object sender, RoutedEventArgs e) =>
-        Next?.Invoke(this, Navigation.Exit);
+    //private void Close_Click(object sender, RoutedEventArgs e) =>
+    //    Next?.Invoke(this, Navigation.Exit);
 
     private void SetVerbose_Toggled(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.SetVerbose(tbnSetVerbose.IsChecked == true)));
