@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Cynexo.App;
@@ -31,9 +32,11 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         }
     }
 
-    public bool CanProceed => _channelControls.Any(c => c.IsActive);
+    public bool CanToggleValves => _channelControls.Any(c => c.IsActive);
+    public bool CanCalibrate => _channelControls.Any(c => c.IsActive) && !_channelControls.Any(c => c.IsOpen);
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler<string>? FlowMeasured;
 
     public HighLevelController(CommPort port, Channel[] channelControls)
     {
@@ -46,7 +49,15 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         {
             channelControl.ActivityChanged += (s, e) =>
             {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanProceed)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanToggleValves)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCalibrate)));
+            };
+            channelControl.AdjustmentRequested += async (s, e) =>
+            {
+                if (s is Channel ch)
+                {
+                    AdjustChannel(ch.ID, e);
+                }
             };
         }
 
@@ -56,6 +67,8 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     public void Dispose()
     {
         _sniff0.Data -= OnData;
+
+        _flowReadingThread = null;
 
         SaveState();
 
@@ -78,30 +91,29 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         {
             int channelIndex = 0;
 
-            _hasResponse = false;
-            _awaitedAction = AwaitingActions.SelectChannel;
+            _receivedResponse = AwaitingResponse.None;
+            _isAwaitingResponse = true;
 
             _sniff0.Send(Command.SetFlow(kvs.ToArray()));
 
-            while (_awaitedAction != AwaitingActions.None)
+            while (_isAwaitingResponse)
             {
                 await Task.Delay(10);
-                if (_hasResponse)
+                if (_receivedResponse != AwaitingResponse.None)
                 {
-                    if (_awaitedAction == AwaitingActions.SelectChannel)
+                    if (_receivedResponse == AwaitingResponse.EnableChannel)
                     {
                         channels[channelIndex].SetState(ChannelOperationState.Calibrating);
-                        _awaitedAction = AwaitingActions.ChannelReady;
                     }
-                    else if (_awaitedAction == AwaitingActions.ChannelReady)
+                    else if (_receivedResponse == AwaitingResponse.ChannelIsReady)
                     {
                         channels[channelIndex].SetState(ChannelOperationState.Calibrated);
 
                         channelIndex += 1;
-                        _awaitedAction = channelIndex < channels.Length ? AwaitingActions.SelectChannel : AwaitingActions.None;
+                        _isAwaitingResponse = channelIndex < channels.Length;
                     }
 
-                    _hasResponse = false;
+                    _receivedResponse = AwaitingResponse.None;
                 }
             }
         }
@@ -126,6 +138,23 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             _sniff0.Send(Command.SetValve(channel.IsOpen));
         }
 
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCalibrate)));
+
+        var hasOpenedChannels = _channelControls.Any(ch => ch.IsOpen);
+        if (hasOpenedChannels && _flowReadingThread == null)
+        {
+            _flowReadingThread = new Thread(ReadFlow);
+            _flowReadingThread.Start();
+        }
+        else if (!hasOpenedChannels && _flowReadingThread != null)
+        {
+            var thread = _flowReadingThread;
+            _flowReadingThread = null;
+            thread.Join();
+
+            FlowMeasured?.Invoke(this, "");
+        }
+
         IsBusy = false;
     }
 
@@ -135,7 +164,6 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         var channels = _channelControls.Where(ch => ch.IsActive).ToArray();
 
-        int additionalTimeMs = (channels.Length - 1) * 200;
         foreach (var channel in channels)
         {
             channel.ToggleFlowState();
@@ -144,52 +172,73 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             _sniff0.Send(Command.SetChannel(channel.ID));
 
             await Task.Delay(100);
-            _sniff0.Send(Command.OpenValve(ms + additionalTimeMs));
+            _sniff0.Send(Command.OpenValve(ms));
 
-            additionalTimeMs -= 200;
-        }
-
-        await Task.Delay(ms);
-
-        foreach (var channel in channels)
-        {
             channel.ToggleFlowState();
         }
 
         IsBusy = false;
     }
 
+    public async void AdjustChannel(int id, Channel.Adjustment direction)
+    {
+        await Task.Delay(50);
+        _sniff0.Send(Command.SetChannel(id));
+        await Task.Delay(50);
+        _sniff0.Send(Command.SetValve(false));
+        await Task.Delay(50);
+        _sniff0.Send(Command.SetMotorDirection(direction == Channel.Adjustment.Up));
+        await Task.Delay(50);
+        _sniff0.Send(Command.RunMotorSteps(5));
+        await Task.Delay(50);
+        _sniff0.Send(Command.SetValve(true));
+    }
+
     // Internal
 
-    enum AwaitingActions
+    enum AwaitingResponse
     {
         None,
-        SelectChannel,
-        ChannelReady,
+        EnableChannel,
+        ChannelIsReady,
     }
 
     record class ChannelState(bool IsActive, double Flow);
 
-    readonly Dictionary<AwaitingActions, string> Actions = new()
+    readonly Dictionary<AwaitingResponse, string> AwaitingResponses = new()
     {
-        { AwaitingActions.None, "" },
-        { AwaitingActions.SelectChannel, "enable Channel" },
-        { AwaitingActions.ChannelReady, "Value in range" },
+        { AwaitingResponse.None, "" },
+        { AwaitingResponse.EnableChannel, "enable Channel" },
+        { AwaitingResponse.ChannelIsReady, "Value in range" },
     };
 
     readonly CommPort _sniff0;
     readonly Channel[] _channelControls;
 
-    AwaitingActions _awaitedAction = AwaitingActions.None;
-    bool _hasResponse = false;
+    bool _isAwaitingResponse = false;
+    AwaitingResponse _receivedResponse = AwaitingResponse.None;
+    Thread? _flowReadingThread;
 
     private async void OnData(object? sender, string data)
     {
         await Task.Run(() =>
         {
-            if (data.StartsWith(Actions[_awaitedAction]))
+            if (_flowReadingThread != null)
             {
-                _hasResponse = true;
+                var p = data.Split(' ');
+                if (p.Length == 3 && p[0].StartsWith("Flow"))
+                    FlowMeasured?.Invoke(this, p[2]);
+            }
+            else if (_isAwaitingResponse)
+            {
+                if (data.StartsWith(AwaitingResponses[AwaitingResponse.EnableChannel]))
+                {
+                    _receivedResponse = AwaitingResponse.EnableChannel;
+                }
+                else if (data.StartsWith(AwaitingResponses[AwaitingResponse.ChannelIsReady]))
+                {
+                    _receivedResponse = AwaitingResponse.ChannelIsReady;
+                }
             }
         });
     }
@@ -220,5 +269,28 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         var settings = Properties.Settings.Default;
         settings.Controller_Flows = flowsJson;
         settings.Save();
+    }
+
+    /// <summary>
+    /// The procedure that is running in a separate thread
+    /// </summary>
+    private void ReadFlow()
+    {
+        while (true)
+        {
+            try { Thread.Sleep(500); }
+            catch (ThreadInterruptedException) { break; }  // will exit the loop upon Interrupt is called
+
+            if (_flowReadingThread == null)
+            {
+                break;
+            }
+
+            var response = _sniff0.Send(Command.ReadFlow);
+            if (response.Error != Error.Success)
+                break;
+        }
+
+        _flowReadingThread = null;
     }
 }

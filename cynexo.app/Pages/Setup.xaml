@@ -56,6 +56,19 @@
             <Setter Property="MinWidth" Value="120"/>
         </Style>
 
+        <Style x:Key="HighLevel" TargetType="{x:Type StackPanel}">
+            <Setter Property="DataContext" Value="{Binding HighLevelController}"/>
+            <Setter Property="IsEnabled" Value="False"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsBusy}" Value="False"/>
+                        <Condition Binding="{Binding IsVerbose}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="IsEnabled" Value="True"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
 
     <Grid>
@@ -531,66 +544,81 @@
 
             <StackPanel x:Name="stpHighLevel" Grid.Row="1" Grid.Column="1"
                         HorizontalAlignment="Center"
-                        DataContext="{Binding HighLevelController}"
-                        IsEnabled="{Binding IsBusy, Converter={StaticResource inverse}}"
-                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}">
-                <Label Margin="0,0,0,4"
-                       HorizontalAlignment="Center"
-                       Content="Channels"/>
-                <WrapPanel x:Name="wplChannels" Grid.Row="1" Grid.Column="1">
-                    <StackPanel Margin="0,0,20,0">
-                        <local:Channel ID="0"/>
-                        <local:Channel ID="1"/>
-                        <local:Channel ID="2"/>
-                        <local:Channel ID="3"/>
-                        <local:Channel ID="4"/>
-                    </StackPanel>
-                    <StackPanel Margin="0,0,20,0">
-                        <local:Channel ID="5"/>
-                        <local:Channel ID="6"/>
-                        <local:Channel ID="7"/>
-                        <local:Channel ID="8"/>
-                        <local:Channel ID="9"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <local:Channel ID="10"/>
-                        <local:Channel ID="11"/>
-                        <local:Channel ID="12"/>
-                        <local:Channel ID="13"/>
-                    </StackPanel>
-                </WrapPanel>
+                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}" Margin="0,6,0,-6">
 
-                <UniformGrid Margin="0,12,0,0"
-                             HorizontalAlignment="Center"
-                             Rows="2"
-                             Columns="2">
-                    <Button Style="{StaticResource Wide}"
-                        IsEnabled="{Binding CanProceed}"
-                        Content="Calibrate"
-                        Click="HLCalibrate_Click"/>
-                    <Button Style="{StaticResource Wide}"
-                        IsEnabled="{Binding CanProceed}"
-                        Content="Toggle valves"
-                        Click="HLStartStop_Click"/>
-                    <Label/>
-                    <WrapPanel>
-                        <CheckBox x:Name="chkUseTimer"
-                                  Height="24"
-                                  Content="for"/>
-                        <WrapPanel IsEnabled="{Binding ElementName=chkUseTimer, Path=IsChecked}">
-                            <TextBox x:Name="txbTimerInterval"
-                                     Text="1000"/>
-                            <Label Content="ms"/>
-                        </WrapPanel>
-                    </WrapPanel>
-                </UniformGrid>
-
-                <Separator/>
-                
-                <StackPanel>
+                <StackPanel DataContext="{Binding HighLevelController}"
+                            HorizontalAlignment="Center">
                     <CheckBox Content="Verbose"
                               Height="26"
+                              ToolTip="Verbose mode must be ON to continue using the high-level functionality"
                               IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
+                </StackPanel>
+
+                <Separator/>
+
+                <StackPanel Style="{StaticResource HighLevel}">
+                    <Label Margin="0,0,0,4"
+                           HorizontalAlignment="Center"
+                           Content="Channels"/>
+                    <WrapPanel x:Name="wplChannels" Grid.Row="1" Grid.Column="1">
+                        <StackPanel Margin="0,0,20,0">
+                            <local:Channel ID="0"/>
+                            <local:Channel ID="1"/>
+                            <local:Channel ID="2"/>
+                            <local:Channel ID="3"/>
+                            <local:Channel ID="4"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,20,0">
+                            <local:Channel ID="5"/>
+                            <local:Channel ID="6"/>
+                            <local:Channel ID="7"/>
+                            <local:Channel ID="8"/>
+                            <local:Channel ID="9"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <local:Channel ID="10"/>
+                            <local:Channel ID="11"/>
+                            <local:Channel ID="12"/>
+                            <local:Channel ID="13"/>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <UniformGrid Margin="0,12,0,0"
+                                 HorizontalAlignment="Center"
+                                 Rows="2"
+                                 Columns="2">
+                        <Button Style="{StaticResource Wide}"
+                            IsEnabled="{Binding CanCalibrate}"
+                            Content="Calibrate"
+                            Click="HLCalibrate_Click"/>
+                        <Button Style="{StaticResource Wide}"
+                            IsEnabled="{Binding CanToggleValves}"
+                            Content="Toggle valves"
+                            Click="HLStartStop_Click"/>
+
+                        <Label/>
+                        <WrapPanel>
+                            <CheckBox x:Name="chkUseTimer"
+                                      Height="24"
+                                      Content="for"/>
+                            <WrapPanel IsEnabled="{Binding ElementName=chkUseTimer, Path=IsChecked}">
+                                <TextBox x:Name="txbTimerInterval"
+                                         Text="1000"/>
+                                <Label Content="ms"/>
+                                <Image Source="/Assets/images/exclamation.png"
+                                       Height="16"
+                                       ToolTip="The valves will be opened one by one"
+                                       ToolTipService.InitialShowDelay="0"/>
+                            </WrapPanel>
+                        </WrapPanel>
+                    </UniformGrid>
+
+                    <Separator/>
+                    
+                    <WrapPanel HorizontalAlignment="Center">
+                        <Label Margin="24,0,0,0">Flow:</Label>
+                        <Label x:Name="lblFlow"/>
+                    </WrapPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>

@@ -21,6 +21,13 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
         InitializeComponent();
 
         _controller = new HighLevelController(_sniff0, GetHLChannels());
+        _controller.FlowMeasured += (s, e) => Dispatcher.Invoke(() => {
+            if (double.TryParse(e, out double flow))
+                lblFlow.Content = $"{flow:F2}";
+            else
+                lblFlow.Content = null;
+        });
+
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighLevelController)));
 
         App.Current.Exit += (s, e) =>

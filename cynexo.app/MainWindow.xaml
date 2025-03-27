@@ -7,7 +7,7 @@
         Title="Cynexo UI tool"
         Icon="/Assets/icons/main.png"
         Height="750" Width="1200"
-        MinHeight="480" MinWidth="1000"
+        MinHeight="550" MinWidth="1000"
         Loaded="Window_Loaded"
         PreviewKeyDown="Window_PreviewKeyDown"
         PreviewMouseWheel="Window_PreviewMouseWheel" 
