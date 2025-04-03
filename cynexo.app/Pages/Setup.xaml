@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       xmlns:utils="clr-namespace:Cynexo.App.Utils" 
       xmlns:local="clr-namespace:Cynexo.App" 
       xmlns:comm="clr-namespace:Cynexo.Communicator;assembly=Cynexo.Communicator" 
@@ -19,6 +20,7 @@
     <Page.Resources>
         <utils:BoolToVisibilityConverter x:Key="bool2vis"/>
         <utils:BoolInverseConverter x:Key="inverse"/>
+        <sys:Boolean x:Key="inverted">True</sys:Boolean>
 
         <Style TargetType="{x:Type Label}">
             <Setter Property="Padding" Value="4,2,8,2"/>
@@ -57,7 +59,6 @@
         </Style>
 
         <Style x:Key="HighLevel" TargetType="{x:Type StackPanel}">
-            <Setter Property="DataContext" Value="{Binding HighLevelController}"/>
             <Setter Property="IsEnabled" Value="False"/>
             <Style.Triggers>
                 <MultiDataTrigger>
@@ -101,6 +102,13 @@
                      VerticalContentAlignment="Top"
                      HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Visible"/>
+            <WrapPanel Grid.Row="0" Grid.Column="0"
+                       HorizontalAlignment="Right"
+                       Margin="4,6,26,4">
+                <Button Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                        Content="🗑"
+                        Click="ClearLog_Click"/>
+            </WrapPanel>
 
             <CheckBox x:Name="chkMode" Grid.Row="0" Grid.Column="1"
                       Style="{StaticResource Switch}"
@@ -545,17 +553,29 @@
                         HorizontalAlignment="Center"
                         Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}" Margin="0,6,0,-6">
 
-                <StackPanel DataContext="{Binding HighLevelController}"
-                            HorizontalAlignment="Center">
+                <Separator/>
+
+                <StackPanel DataContext="{Binding HighLevelController}">
+                    <CheckBox Style="{StaticResource Switch}"
+                              Tag="Control"
+                              IsChecked="{Binding IsCalibrationMode, Mode=TwoWay}"
+                              IsEnabled="{Binding CanChangeMode, Mode=OneWay}"
+                              Content="Calibration"
+                              Margin="0,8"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="Center"/>
+        
                     <CheckBox Content="Verbose"
                               Height="26"
+                              HorizontalAlignment="Center"
                               ToolTip="Verbose mode must be ON to continue using the high-level functionality"
                               IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
                 </StackPanel>
 
                 <Separator/>
 
-                <StackPanel Style="{StaticResource HighLevel}">
+                <StackPanel Style="{StaticResource HighLevel}"
+                            DataContext="{Binding HighLevelController, Mode=OneWay}">
                     <Label Margin="0,0,0,4"
                            HorizontalAlignment="Center"
                            Content="Channels"/>
@@ -582,10 +602,37 @@
                         </StackPanel>
                     </WrapPanel>
 
-                    <UniformGrid Margin="0,12,0,0"
+                    <Grid HorizontalAlignment="Center"
+                          Margin="0,8">
+                        <Button Style="{StaticResource Next}"
+                                IsEnabled="{Binding CanCalibrate}"
+                                Content="Calibrate"
+                                Margin="0"
+                                HorizontalAlignment="Center"
+                                Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}"
+                                Click="HLCalibrate_Click"/>
+                        <StackPanel Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Label Content="Adjustment steps: "/>
+                                <Label Width="32" 
+                                       Content="{Binding ElementName=sldAdjustmentStep, Path=Value, Mode=OneWay}"/>
+                            </WrapPanel>
+                            <Slider x:Name="sldAdjustmentStep" Width="200"
+                                    Minimum="5"
+                                    Maximum="30"
+                                    LargeChange="5"
+                                    SmallChange="5"
+                                    TickFrequency="5"
+                                    Value="{Binding ValveMotorAdjustmentSteps}"
+                                    TickPlacement="Both"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--UniformGrid Margin="0,12,0,0"
                                  HorizontalAlignment="Center"
                                  Rows="2"
-                                 Columns="2">
+                                 Columns="2"
+                                 Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}">
                         <Button Style="{StaticResource Wide}"
                             IsEnabled="{Binding CanCalibrate}"
                             Content="Calibrate"
@@ -610,7 +657,7 @@
                                        ToolTipService.InitialShowDelay="0"/>
                             </WrapPanel>
                         </WrapPanel>
-                    </UniformGrid>
+                    </UniformGrid-->
 
                     <Separator/>
                     

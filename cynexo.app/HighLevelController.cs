@@ -32,6 +32,28 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         }
     }
 
+    public bool IsCalibrationMode
+    {
+        get => field;
+        set
+        {
+            if (!value)
+            {
+                foreach (var channelControl in _channelControls)
+                {
+                    channelControl.IsActive = false;
+                }
+            }
+
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCalibrationMode)));
+        }
+    } = true;
+
+    public int ValveMotorAdjustmentSteps { get; set; } = 10;
+
+    public bool CanChangeMode => IsCalibrationMode || !_channelControls.Any(c => c.IsActive);
+
     public bool CanToggleValves => _channelControls.Any(c => c.IsActive);
     public bool CanCalibrate => _channelControls.Any(c => c.IsActive) && !_channelControls.Any(c => c.IsOpen);
 
@@ -47,12 +69,25 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         foreach (var channelControl in channelControls)
         {
-            channelControl.ActivityChanged += (s, e) =>
+            channelControl.ActivityChanged += async (s, e) =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanToggleValves)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCalibrate)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanChangeMode)));
+
+                if (!IsCalibrationMode)
+                {
+                    var channel = (Channel)s!;
+                    channel.ToggleFlowState();
+
+                    await Task.Delay(100);
+                    _sniff0.Send(Command.SetChannel(channel.ID));
+
+                    await Task.Delay(100);
+                    _sniff0.Send(Command.SetValve(channel.IsOpen));
+                }
             };
-            channelControl.AdjustmentRequested += async (s, e) =>
+            channelControl.AdjustmentRequested += (s, e) =>
             {
                 if (s is Channel ch)
                 {
@@ -140,6 +175,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanCalibrate)));
 
+        /*
         var hasOpenedChannels = _channelControls.Any(ch => ch.IsOpen);
         if (hasOpenedChannels && _flowReadingThread == null)
         {
@@ -153,7 +189,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             thread.Join();
 
             FlowMeasured?.Invoke(this, "");
-        }
+        }*/
 
         IsBusy = false;
     }
@@ -189,7 +225,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         await Task.Delay(50);
         _sniff0.Send(Command.SetMotorDirection(direction == Channel.Adjustment.Up));
         await Task.Delay(50);
-        _sniff0.Send(Command.RunMotorSteps(5));
+        _sniff0.Send(Command.RunMotorSteps(ValveMotorAdjustmentSteps));
         await Task.Delay(50);
         _sniff0.Send(Command.SetValve(true));
     }
@@ -245,7 +281,11 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
     private void LoadState()
     {
-        var flowsJson = Properties.Settings.Default.Controller_Flows;
+        var settings = Properties.Settings.Default;
+
+        ValveMotorAdjustmentSteps = settings.Controller_ValveMotorAdjustmentSteps;
+
+        var flowsJson = settings.Controller_Flows;
         if (!string.IsNullOrEmpty(flowsJson))
         {
             try
@@ -268,6 +308,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
         var settings = Properties.Settings.Default;
         settings.Controller_Flows = flowsJson;
+        settings.Controller_ValveMotorAdjustmentSteps = ValveMotorAdjustmentSteps;
         settings.Save();
     }
 

@@ -157,6 +157,11 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
             .UnbindVisibilityToDebug(lblDebug);
     }
 
+    private void ClearLog_Click(object sender, RoutedEventArgs e)
+    {
+        txbResponses.Text = "";
+    }
+
     //private void Close_Click(object sender, RoutedEventArgs e) =>
     //    Next?.Invoke(this, Navigation.Exit);
 
@@ -295,7 +300,7 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     {
         _controller.Calibrate();
     }
-
+    /*
     private void HLStartStop_Click(object sender, RoutedEventArgs e)
     {
         if (chkUseTimer.IsChecked == true)
@@ -309,5 +314,5 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
         {
             _controller.Toggle();
         }
-    }
+    }*/
 }

@@ -130,5 +130,17 @@ namespace Cynexo.App.Properties {
                 this["Controller_Flows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int Controller_ValveMotorAdjustmentSteps {
+            get {
+                return ((int)(this["Controller_ValveMotorAdjustmentSteps"]));
+            }
+            set {
+                this["Controller_ValveMotorAdjustmentSteps"] = value;
+            }
+        }
     }
 }
