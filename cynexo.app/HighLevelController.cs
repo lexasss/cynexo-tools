@@ -112,44 +112,52 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
     public async void Calibrate()
     {
+        var channels = _channelControls.Where(ch => ch.IsActive && ch.Flow > 0).ToArray();
+
+        if (!channels.Any())
+        {
+            return;
+        }
+
         IsBusy = true;
 
-        foreach (var channel in _channelControls)
+        foreach (var channel in channels)
         {
             channel.SetState(ChannelOperationState.Initial);
         }
 
-        var channels = _channelControls.Where(ch => ch.IsActive && ch.Flow > 0).ToArray();
         var kvs = channels.Select(ch => new KeyValuePair<int, float>(ch.ID, (float)ch.Flow));
 
-        if (kvs.Any())
+        int channelIndex = 0;
+
+        _receivedResponse = new();
+        _isAwaitingResponse = true;
+
+        _sniff0.Send(Command.SetFlow(kvs.ToArray()));
+
+        while (_isAwaitingResponse)
         {
-            int channelIndex = 0;
-
-            _receivedResponse = AwaitingResponse.None;
-            _isAwaitingResponse = true;
-
-            _sniff0.Send(Command.SetFlow(kvs.ToArray()));
-
-            while (_isAwaitingResponse)
+            await Task.Delay(10);
+            if (_receivedResponse.Id != AwaitingResponse.None)
             {
-                await Task.Delay(10);
-                if (_receivedResponse != AwaitingResponse.None)
+                if (_receivedResponse.Id == AwaitingResponse.EnableChannel)
                 {
-                    if (_receivedResponse == AwaitingResponse.EnableChannel)
-                    {
-                        channels[channelIndex].SetState(ChannelOperationState.Calibrating);
-                    }
-                    else if (_receivedResponse == AwaitingResponse.ChannelIsReady)
-                    {
-                        channels[channelIndex].SetState(ChannelOperationState.Calibrated);
-
-                        channelIndex += 1;
-                        _isAwaitingResponse = channelIndex < channels.Length;
-                    }
-
-                    _receivedResponse = AwaitingResponse.None;
+                    channels[channelIndex].SetState(ChannelOperationState.Calibrating);
                 }
+                else if (_receivedResponse.Id == AwaitingResponse.MeasuredFlow)
+                {
+                    if (_receivedResponse.Parameters?.Length == 1)
+                        channels[channelIndex].MeasuredFlow = double.Parse(_receivedResponse.Parameters[0]);
+                }
+                else if (_receivedResponse.Id == AwaitingResponse.ChannelIsReady)
+                {
+                    channels[channelIndex].SetState(ChannelOperationState.Calibrated);
+
+                    channelIndex += 1;
+                    _isAwaitingResponse = channelIndex < channels.Length;
+                }
+
+                _receivedResponse = new();
             }
         }
 
@@ -237,22 +245,25 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         None,
         EnableChannel,
         ChannelIsReady,
+        MeasuredFlow,
     }
 
     record class ChannelState(bool IsActive, double Flow);
+    record class Response(AwaitingResponse Id = AwaitingResponse.None, string[]? Parameters = null);
 
     readonly Dictionary<AwaitingResponse, string> AwaitingResponses = new()
     {
         { AwaitingResponse.None, "" },
         { AwaitingResponse.EnableChannel, "enable Channel" },
         { AwaitingResponse.ChannelIsReady, "Value in range" },
+        { AwaitingResponse.MeasuredFlow, "Measured Flow" },
     };
 
     readonly CommPort _sniff0;
     readonly Channel[] _channelControls;
 
     bool _isAwaitingResponse = false;
-    AwaitingResponse _receivedResponse = AwaitingResponse.None;
+    Response _receivedResponse = new();
     Thread? _flowReadingThread;
 
     private async void OnData(object? sender, string data)
@@ -269,11 +280,16 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             {
                 if (data.StartsWith(AwaitingResponses[AwaitingResponse.EnableChannel]))
                 {
-                    _receivedResponse = AwaitingResponse.EnableChannel;
+                    _receivedResponse = new(AwaitingResponse.EnableChannel);
                 }
                 else if (data.StartsWith(AwaitingResponses[AwaitingResponse.ChannelIsReady]))
                 {
-                    _receivedResponse = AwaitingResponse.ChannelIsReady;
+                    _receivedResponse = new(AwaitingResponse.ChannelIsReady);
+                }
+                else if (data.StartsWith(AwaitingResponses[AwaitingResponse.MeasuredFlow]))
+                {
+                    var flow = data.Split(' ').Last();
+                    _receivedResponse = new(AwaitingResponse.MeasuredFlow, [flow]);
                 }
             }
         });

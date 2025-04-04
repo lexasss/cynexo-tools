@@ -59,11 +59,12 @@
         </Style>
 
         <Style x:Key="HighLevel" TargetType="{x:Type StackPanel}">
+            <Setter Property="DataContext" Value="{Binding HighLevelController, Mode=OneWay}"/>
             <Setter Property="IsEnabled" Value="False"/>
             <Style.Triggers>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsBusy}" Value="False"/>
+                        <Condition Binding="{Binding Path=IsBusy}" Value="False"/>
                         <Condition Binding="{Binding IsVerbose}" Value="True"/>
                     </MultiDataTrigger.Conditions>
                     <Setter Property="IsEnabled" Value="True"/>
@@ -574,8 +575,7 @@
 
                 <Separator/>
 
-                <StackPanel Style="{StaticResource HighLevel}"
-                            DataContext="{Binding HighLevelController, Mode=OneWay}">
+                <StackPanel Style="{StaticResource HighLevel}">
                     <Label Margin="0,0,0,4"
                            HorizontalAlignment="Center"
                            Content="Channels"/>
@@ -604,20 +604,21 @@
 
                     <Grid HorizontalAlignment="Center"
                           Margin="0,8">
-                        <Button Style="{StaticResource Next}"
-                                IsEnabled="{Binding CanCalibrate}"
-                                Content="Calibrate"
-                                Margin="0"
-                                HorizontalAlignment="Center"
-                                Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}"
-                                Click="HLCalibrate_Click"/>
+                        <StackPanel HorizontalAlignment="Center"
+                                    Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}">
+                            <Button Style="{StaticResource Next}"
+                                    IsEnabled="{Binding CanCalibrate}"
+                                    Content="Calibrate"
+                                    Click="HLCalibrate_Click"/>
+                        </StackPanel>
                         <StackPanel Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
                             <WrapPanel HorizontalAlignment="Center">
                                 <Label Content="Adjustment steps: "/>
                                 <Label Width="32" 
                                        Content="{Binding ElementName=sldAdjustmentStep, Path=Value, Mode=OneWay}"/>
                             </WrapPanel>
-                            <Slider x:Name="sldAdjustmentStep" Width="200"
+                            <Slider x:Name="sldAdjustmentStep"
+                                    Width="200"
                                     Minimum="5"
                                     Maximum="30"
                                     LargeChange="5"

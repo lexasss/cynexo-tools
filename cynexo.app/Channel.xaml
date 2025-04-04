@@ -25,7 +25,6 @@
             <Setter Property="Margin" Value="4,0"/>
             <Setter Property="Padding" Value="4,0"/>
             <Setter Property="FontSize" Value="6"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Visibility" Value="{Binding IsOpen, Converter={StaticResource bool2vis}}"/>
         </Style>
     </UserControl.Resources>
@@ -45,20 +44,28 @@
         <WrapPanel>
             <CheckBox Content="{Binding ID}"
                       IsChecked="{Binding IsActive, Mode=TwoWay}"/>
-            <TextBox Text="{Binding Flow, Mode=TwoWay}"/>
+            <TextBox Text="{Binding Flow, Mode=TwoWay}">
+                <TextBox.ToolTip>
+                    <ToolTip Content="{Binding MeasuredFlow, Mode=OneWay}"
+                             ContentStringFormat="Measured: {0}"
+                             ToolTipService.InitialShowDelay="300"/>
+                </TextBox.ToolTip>
+            </TextBox>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition Height="2"/>
+                    <RowDefinition Height="1"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0" 
                         Style="{StaticResource Arrow}"
-                        Content="︽"
+                        Content="⩓"
+                        ToolTip="Increase the flow"
                         Click="Up_Click"/>
                 <Button Grid.Row="2" 
                         Style="{StaticResource Arrow}"
-                        Content="︾"
+                        Content="⩔"
+                        ToolTip="Decrease the flow"
                         Click="Down_Click"/>
             </Grid>
         </WrapPanel>
