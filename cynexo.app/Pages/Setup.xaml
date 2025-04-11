@@ -19,6 +19,8 @@
 
     <Page.Resources>
         <utils:BoolToVisibilityConverter x:Key="bool2vis"/>
+        <utils:BoolToPresenseConverter x:Key="bool2pres"/>
+        <utils:ObjectToBoolConverter x:Key="object2bool"/>
         <utils:BoolInverseConverter x:Key="inverse"/>
         <sys:Boolean x:Key="inverted">True</sys:Boolean>
 
@@ -66,10 +68,17 @@
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding Path=IsBusy}" Value="False"/>
                         <Condition Binding="{Binding IsVerbose}" Value="True"/>
+                        <Condition Binding="{Binding IsManualCalibrationActive}" Value="False"/>
                     </MultiDataTrigger.Conditions>
                     <Setter Property="IsEnabled" Value="True"/>
                 </MultiDataTrigger>
             </Style.Triggers>
+        </Style>
+
+        <Style x:Key="Arrow" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="FontSize" Value="12"/>
         </Style>
     </Page.Resources>
 
@@ -554,9 +563,17 @@
                         HorizontalAlignment="Center"
                         Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}" Margin="0,6,0,-6">
 
-                <Separator/>
+                <StackPanel DataContext="{Binding HighLevelController}"
+                            Visibility="{Binding IsVerbose, Converter={StaticResource bool2pres}, ConverterParameter={StaticResource inverted}}">
+                    <CheckBox Content="Verbose"
+                          Height="26"
+                          HorizontalAlignment="Center"
+                          ToolTip="Verbose mode must be ON to continue using the high-level functionality"
+                          IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
+                </StackPanel>
 
-                <StackPanel DataContext="{Binding HighLevelController}">
+                <StackPanel DataContext="{Binding HighLevelController}"
+                            Visibility="{Binding IsVerbose, Converter={StaticResource bool2pres}}">
                     <CheckBox Style="{StaticResource Switch}"
                               Tag="Control"
                               IsChecked="{Binding IsCalibrationMode, Mode=TwoWay}"
@@ -565,20 +582,18 @@
                               Margin="0,8"
                               HorizontalAlignment="Stretch"
                               HorizontalContentAlignment="Center"/>
-        
-                    <CheckBox Content="Verbose"
-                              Height="26"
-                              HorizontalAlignment="Center"
-                              ToolTip="Verbose mode must be ON to continue using the high-level functionality"
-                              IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
+                    <Separator/>
                 </StackPanel>
 
-                <Separator/>
-
-                <StackPanel Style="{StaticResource HighLevel}">
-                    <Label Margin="0,0,0,4"
-                           HorizontalAlignment="Center"
-                           Content="Channels"/>
+                <StackPanel Style="{StaticResource HighLevel}"
+                            Visibility="{Binding IsVerbose, Converter={StaticResource bool2pres}}">
+                    <Grid Margin="0,0,0,4"
+                          HorizontalAlignment="Center">
+                        <Label Content="Automatic calibration"
+                               Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2pres}}"/>
+                        <Label Content="Channels"
+                               Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2pres}, ConverterParameter={StaticResource inverted}}"/>
+                    </Grid>
                     <WrapPanel x:Name="wplChannels" Grid.Row="1" Grid.Column="1">
                         <StackPanel Margin="0,0,20,0">
                             <local:Channel ID="0"/>
@@ -606,12 +621,12 @@
                           Margin="0,8">
                         <StackPanel HorizontalAlignment="Center"
                                     Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}">
-                            <Button Style="{StaticResource Next}"
-                                    IsEnabled="{Binding CanCalibrate}"
+                            <Button Style="{StaticResource Wide}"
+                                    IsEnabled="{Binding CanAutoCalibrate}"
                                     Content="Calibrate"
                                     Click="HLCalibrate_Click"/>
                         </StackPanel>
-                        <StackPanel Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
+                        <!--StackPanel Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
                             <WrapPanel HorizontalAlignment="Center">
                                 <Label Content="Adjustment steps: "/>
                                 <Label Width="32" 
@@ -624,49 +639,93 @@
                                     LargeChange="5"
                                     SmallChange="5"
                                     TickFrequency="5"
-                                    Value="{Binding ValveMotorAdjustmentSteps}"
+                                    Value="{Binding ValveMotorAdjustmentSteps, Mode=TwoWay}"
                                     TickPlacement="Both"/>
-                        </StackPanel>
+                        </StackPanel-->
                     </Grid>
+                </StackPanel>
 
-                    <!--UniformGrid Margin="0,12,0,0"
-                                 HorizontalAlignment="Center"
-                                 Rows="2"
-                                 Columns="2"
-                                 Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}}">
-                        <Button Style="{StaticResource Wide}"
-                            IsEnabled="{Binding CanCalibrate}"
-                            Content="Calibrate"
-                            Click="HLCalibrate_Click"/>
-                        <Button Style="{StaticResource Wide}"
-                            IsEnabled="{Binding CanToggleValves}"
-                            Content="Toggle valves"
-                            Click="HLStartStop_Click"/>
-
-                        <Label/>
-                        <WrapPanel>
-                            <CheckBox x:Name="chkUseTimer"
-                                      Height="24"
-                                      Content="for"/>
-                            <WrapPanel IsEnabled="{Binding ElementName=chkUseTimer, Path=IsChecked}">
-                                <TextBox x:Name="txbTimerInterval"
-                                         Text="1000"/>
-                                <Label Content="ms"/>
-                                <Image Source="/Assets/images/exclamation.png"
-                                       Height="16"
-                                       ToolTip="The selected channels will be activated one by one and only one valve will be opened at a time."
-                                       ToolTipService.InitialShowDelay="0"/>
-                            </WrapPanel>
-                        </WrapPanel>
-                    </UniformGrid-->
-
-                    <Separator/>
+                <StackPanel DataContext="{Binding HighLevelController}">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsVerbose}" Value="True"/>
+                                        <Condition Binding="{Binding IsCalibrationMode}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
                     
-                    <WrapPanel HorizontalAlignment="Center">
-                        <Label Margin="24,0,0,0">Flow: </Label>
+                    <Separator/>
+                    <Label Content="Manual calibration"
+                           HorizontalAlignment="Center"/>
+                    <WrapPanel HorizontalAlignment="Center"
+                               Margin="0,8">
+                        <Label Content="Channel"/>
+                        <ComboBox x:Name="cmbChannels"
+                                  ItemsSource="{Binding ChannelIDs, Mode=OneWay}"
+                                  IsEnabled="{Binding IsManualCalibrationActive, Converter={StaticResource inverse}}"
+                                  Width="46">
+                        </ComboBox>
+                        <Button x:Name="btnManualCalibration"
+                                Content="Open"
+                                Width="66"
+                                Click="HLManualCalibration_Click">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding ElementName=cmbChannels, Path=SelectedItem, Converter={StaticResource object2bool}}" Value="True"/>
+                                                <Condition Binding="{Binding IsBusy}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Label x:Name="lblFlow"
                                FontFamily="Consolas"
+                               FontSize="16"
+                               Width="66"
+                               HorizontalContentAlignment="Center"
                                Content="0.00"/>
+                        <Grid Margin="0,2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" 
+                                    Style="{StaticResource Arrow}"
+                                    IsEnabled="{Binding IsManualCalibrationActive}"
+                                    Content="⩓"
+                                    ToolTip="Increase the flow"
+                                    Click="HLIncreaseFlow_Click"/>
+                            <Button Grid.Row="2" 
+                                    Style="{StaticResource Arrow}"
+                                    IsEnabled="{Binding IsManualCalibrationActive}"
+                                    Content="⩔"
+                                    ToolTip="Decrease the flow"
+                                    Click="HLDecreaseFlow_Click"/>
+                        </Grid>
+                        <Slider x:Name="sldAdjustmentStep2"
+                                Width="100"
+                                Minimum="4"
+                                Maximum="30"
+                                LargeChange="5"
+                                SmallChange="2"
+                                Value="{Binding ValveMotorAdjustmentSteps, Mode=TwoWay}"
+                                TickPlacement="Both"/>
+                        <Label Content="{Binding ElementName=sldAdjustmentStep2, Path=Value, Mode=OneWay}"
+                               Width="26"/>
                     </WrapPanel>
                 </StackPanel>
             </StackPanel>

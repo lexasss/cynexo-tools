@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:Cynexo.App.Utils" 
              xmlns:local="clr-namespace:Cynexo.App"
              mc:Ignorable="d" 
@@ -13,9 +14,15 @@
     
     <UserControl.Resources>
         <utils:BoolToVisibilityConverter x:Key="bool2vis"/>
+        <utils:BoolInverseConverter x:Key="inverse"/>
+        <sys:Boolean x:Key="true">True</sys:Boolean>
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="MinWidth" Value="32"/>
+            <Setter Property="MinWidth" Value="36"/>
+        </Style>
+        <Style x:Key="FlowRateIndicator" TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="MinWidth" Value="36"/>
+            <Setter Property="Background" Value="#EEEEEE"/>
         </Style>
         <Style x:Key="Status" TargetType="{x:Type Image}">
             <Setter Property="Width" Value="16"/>
@@ -44,14 +51,21 @@
         <WrapPanel>
             <CheckBox Content="{Binding ID}"
                       IsChecked="{Binding IsActive, Mode=TwoWay}"/>
-            <TextBox Text="{Binding Flow, Mode=TwoWay}">
-                <TextBox.ToolTip>
-                    <ToolTip Content="{Binding MeasuredFlow, Mode=OneWay}"
-                             ContentStringFormat="Measured: {0}"
-                             ToolTipService.InitialShowDelay="300"/>
-                </TextBox.ToolTip>
-            </TextBox>
             <Grid>
+                <TextBox Text="{Binding Flow, Mode=TwoWay}"
+                         Visibility="{Binding CanEditFlow, Mode=OneWay, Converter={StaticResource bool2vis}}">
+                    <TextBox.ToolTip>
+                        <ToolTip Content="{Binding MeasuredFlow, Mode=OneWay}"
+                                 ContentStringFormat="Measured: {0}"
+                                 ToolTipService.InitialShowDelay="300"/>
+                    </TextBox.ToolTip>
+                </TextBox>
+                <Label Style="{StaticResource FlowRateIndicator}"
+                       Content="{Binding MeasuredFlow, Mode=OneWay}"
+                       ContentStringFormat="{} {0:F2}"
+                       Visibility="{Binding CanEditFlow, Mode=OneWay, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource true}}"/>
+            </Grid>
+            <!--Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition Height="1"/>
@@ -67,7 +81,7 @@
                         Content="⩔"
                         ToolTip="Decrease the flow"
                         Click="Down_Click"/>
-            </Grid>
+            </Grid-->
         </WrapPanel>
     </WrapPanel>
 </UserControl>

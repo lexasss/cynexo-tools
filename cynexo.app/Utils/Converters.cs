@@ -47,6 +47,26 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
+public class BoolToPresenseConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        bool isInverted = parameter != null;
+        return (bool)value ?
+            (isInverted ? Visibility.Collapsed : Visibility.Visible) :
+            (isInverted ? Visibility.Visible : Visibility.Collapsed);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        bool isInverted = parameter != null;
+        var visibility = (Visibility)value;
+        return isInverted ?
+            visibility != Visibility.Visible :
+            visibility == Visibility.Visible;
+    }
+}
+
 public class ObjectToBoolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

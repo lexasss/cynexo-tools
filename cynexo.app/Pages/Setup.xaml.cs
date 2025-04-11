@@ -300,6 +300,25 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     {
         _controller.Calibrate();
     }
+
+    private void HLManualCalibration_Click(object sender, RoutedEventArgs e)
+    {
+        _controller.ToggleFlow((int)cmbChannels.SelectedItem);
+        _controller.ToggleFlowMeasurements();
+
+        btnManualCalibration.Content = _controller.IsManualCalibrationActive ? "Close" : "Open";
+    }
+
+    private void HLIncreaseFlow_Click(object sender, RoutedEventArgs e)
+    {
+        _controller.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Up);
+    }
+
+    private void HLDecreaseFlow_Click(object sender, RoutedEventArgs e)
+    {
+        _controller.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Down);
+    }
+
     /*
     private void HLStartStop_Click(object sender, RoutedEventArgs e)
     {

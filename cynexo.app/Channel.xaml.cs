@@ -65,6 +65,16 @@ public partial class Channel : UserControl, INotifyPropertyChanged
         }
     }
 
+    public bool CanEditFlow
+    {
+        get => field;
+        set
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CanEditFlow)));
+        }
+    } = true;
+
     public bool IsCalibrated { get; private set; }
 
     public bool IsCalibrating => _state == ChannelOperationState.Calibrating;
