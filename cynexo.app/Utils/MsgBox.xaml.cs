@@ -33,17 +33,11 @@ public partial class MsgBox : Window
         Custom = 0x10000,
     }
 
-    public class Result
+    public class Result(MsgBox.Button button, int customButtonID, bool optionAccepted)
     {
-        public Button Button { get; private set; }
-        public int ID { get; private set; }
-        public bool IsOptionAccepted { get; private set; }
-        public Result(Button button, int customButtonID, bool optionAccepted)
-        {
-            Button = button;
-            ID = customButtonID;
-            IsOptionAccepted = optionAccepted;
-        }
+        public Button Button { get; private set; } = button;
+        public int ID { get; private set; } = customButtonID;
+        public bool IsOptionAccepted { get; private set; } = optionAccepted;
     }
 
     public Button ClickedButton { get; private set; } = Button.None;
@@ -51,40 +45,40 @@ public partial class MsgBox : Window
     public bool IsOptionAccepted => chkOption.IsChecked ?? false;
 
     public static void Notify(string? title, string? message) =>
-        Show(title, message, MsgIcon.Info, null, new Button[] { Button.OK });
+        Show(title, message, MsgIcon.Info, null, [Button.OK]);
     public static Button Notify(string? title, string? message, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Info, null, stdButtons).Button;
     public static Result Notify(string? title, string? message, string[] customButtons, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Info, customButtons, stdButtons);
     public static Result Notify(string? title, string? message, string customButton, params Button[] stdButtons) =>
-        Show(title, message, MsgIcon.Info, new string[] { customButton }, stdButtons);
+        Show(title, message, MsgIcon.Info, [customButton], stdButtons);
 
     public static void Error(string? title, string? message) =>
-        Show(title, message, MsgIcon.Error, null, new Button[] { Button.OK });
+        Show(title, message, MsgIcon.Error, null, [Button.OK]);
     public static Button Error(string? title, string? message, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Error, null, stdButtons).Button;
     public static Result Error(string? title, string? message, string[] customButtons, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Error, customButtons, stdButtons);
     public static Result Error(string? title, string? message, string customButton, params Button[] stdButtons) =>
-        Show(title, message, MsgIcon.Error, new string[] { customButton }, stdButtons);
+        Show(title, message, MsgIcon.Error, [customButton], stdButtons);
 
     public static Button Ask(string? title, string? message) =>
-        Show(title, message, MsgIcon.Question, null, new Button[] { Button.Yes, Button.No }).Button;
+        Show(title, message, MsgIcon.Question, null, [Button.Yes, Button.No]).Button;
     public static Button Ask(string? title, string? message, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Question, null, stdButtons).Button;
     public static Result Ask(string? title, string? message, string[] customButtons, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Question, customButtons, stdButtons);
     public static Result Ask(string? title, string? message, string customButton, params Button[] stdButtons) =>
-        Show(title, message, MsgIcon.Question, new string[] { customButton }, stdButtons);
+        Show(title, message, MsgIcon.Question, [customButton], stdButtons);
 
     public static Button Warn(string? title, string? message) =>
-        Show(title, message, MsgIcon.Warning, null, new Button[] { Button.OK, Button.Cancel }).Button;
+        Show(title, message, MsgIcon.Warning, null, [Button.OK, Button.Cancel]).Button;
     public static Button Warn(string? title, string? message, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Warning, null, stdButtons).Button;
     public static Result Warn(string? title, string? message, string[] customButtons, params Button[] stdButtons) =>
         Show(title, message, MsgIcon.Warning, customButtons, stdButtons);
     public static Result Warn(string? title, string? message, string customButton, params Button[] stdButtons) =>
-        Show(title, message, MsgIcon.Warning, new string[] { customButton }, stdButtons);
+        Show(title, message, MsgIcon.Warning, [customButton], stdButtons);
 
     public static Result Custom(string? title, string? message, MsgIcon icon, string? option, string[]? customButtons, params Button[] stdButtons) =>
         Show(title, message, icon, customButtons, stdButtons, option);

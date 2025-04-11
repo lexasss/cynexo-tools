@@ -86,7 +86,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition />
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.LayoutTransform>
             <ScaleTransform x:Name="sctScale"/>
@@ -626,22 +625,6 @@
                                     Content="Calibrate"
                                     Click="HLCalibrate_Click"/>
                         </StackPanel>
-                        <!--StackPanel Visibility="{Binding IsCalibrationMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
-                            <WrapPanel HorizontalAlignment="Center">
-                                <Label Content="Adjustment steps: "/>
-                                <Label Width="32" 
-                                       Content="{Binding ElementName=sldAdjustmentStep, Path=Value, Mode=OneWay}"/>
-                            </WrapPanel>
-                            <Slider x:Name="sldAdjustmentStep"
-                                    Width="200"
-                                    Minimum="5"
-                                    Maximum="30"
-                                    LargeChange="5"
-                                    SmallChange="5"
-                                    TickFrequency="5"
-                                    Value="{Binding ValveMotorAdjustmentSteps, Mode=TwoWay}"
-                                    TickPlacement="Both"/>
-                        </StackPanel-->
                     </Grid>
                 </StackPanel>
 
@@ -730,14 +713,6 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-
-        <!--WrapPanel Grid.Row="2"
-                   HorizontalAlignment="Center">
-            <Button x:Name="btnClose"
-                    Style="{StaticResource Next}"
-                    Content="Close"
-                    Click="Close_Click"/>
-        </WrapPanel-->
 
         <Label x:Name="lblZoom" Style="{StaticResource ZoomIndicator}"/>
         <Label x:Name="lblDebug" Style="{StaticResource DebugWarning}" Visibility="Collapsed"/>

@@ -69,7 +69,7 @@ public static class Command
     /// <returns>String to send to the port</returns>
     public static string SetFlow(KeyValuePair<int, float>[] flows)
     {
-        List<string> result = new();
+        List<string> result = [];
         foreach (var kv in flows)
         {
             result.Add($"{kv.Key}:{kv.Value}");

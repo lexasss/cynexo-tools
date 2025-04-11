@@ -11,7 +11,7 @@ namespace Cynexo.App.Pages;
 
 public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 {
-    public HighLevelController HighLevelController => _controller;
+    public HighLevelController HighLevelController { get; }
 
     public event EventHandler<Navigation>? Next;
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -20,19 +20,14 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     {
         InitializeComponent();
 
-        _controller = new HighLevelController(_sniff0, GetHighLevelChannels());
-        _controller.FlowMeasured += (s, e) => Dispatcher.Invoke(() => {
-            if (double.TryParse(e, out double flow))
-                lblFlow.Content = $"{flow:F2}";
-            else
-                lblFlow.Content = "0.00";
-        });
+        HighLevelController = new HighLevelController(_sniff0, GetHighLevelChannels());
+        HighLevelController.FlowMeasured += (s, e) => Dispatcher.Invoke(() => lblFlow.Content = $"{e:F2}");
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighLevelController)));
 
         App.Current.Exit += (s, e) =>
         {
-            _controller.Dispose();
+            HighLevelController.Dispose();
         };
     }
 
@@ -42,8 +37,6 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     readonly Storage _storage = Storage.Instance;
     readonly CommPort _sniff0 = CommPort.Instance;
-
-    readonly HighLevelController _controller;
 
     private Channel[] GetHighLevelChannels()
     {
@@ -109,11 +102,14 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private async void OnData(object? sender, string data)
     {
-        await Task.Run(() => Dispatcher.Invoke(() =>
+        if (!data.StartsWith("Flow  "))
         {
-            txbResponses.Text += $"RECEIVED: {data}\n";
-            txbResponses.ScrollToEnd();
-        }));
+            await Task.Run(() => Dispatcher.Invoke(() =>
+            {
+                txbResponses.Text += $"RECEIVED: {data}\n";
+                txbResponses.ScrollToEnd();
+            }));
+        }
     }
 
     private async void OnError(object? sender, Result result)
@@ -298,40 +294,24 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private void HLCalibrate_Click(object sender, RoutedEventArgs e)
     {
-        _controller.Calibrate();
+        HighLevelController.Calibrate();
     }
 
     private void HLManualCalibration_Click(object sender, RoutedEventArgs e)
     {
-        _controller.ToggleFlow((int)cmbChannels.SelectedItem);
-        _controller.ToggleFlowMeasurements();
+        HighLevelController.ToggleFlow((int)cmbChannels.SelectedItem);
+        HighLevelController.ToggleFlowMeasurements();
 
-        btnManualCalibration.Content = _controller.IsManualCalibrationActive ? "Close" : "Open";
+        btnManualCalibration.Content = HighLevelController.IsManualCalibrationActive ? "Close" : "Open";
     }
 
     private void HLIncreaseFlow_Click(object sender, RoutedEventArgs e)
     {
-        _controller.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Up);
+        HighLevelController.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Up);
     }
 
     private void HLDecreaseFlow_Click(object sender, RoutedEventArgs e)
     {
-        _controller.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Down);
+        HighLevelController.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Down);
     }
-
-    /*
-    private void HLStartStop_Click(object sender, RoutedEventArgs e)
-    {
-        if (chkUseTimer.IsChecked == true)
-        {
-            if (int.TryParse(txbTimerInterval.Text, out int ms))
-            {
-                _controller.OpenFor(ms);
-            }
-        }
-        else
-        {
-            _controller.Toggle();
-        }
-    }*/
 }

@@ -30,18 +30,11 @@ public enum Error
 /// <summary>
 /// Operation reslt description used to return from <see cref="CommPort"/> public methods
 /// </summary>
-public class Result
+public class Result(string operation, Error error, string reason)
 {
-    public string Operation { get; init; }
-    public Error Error { get; init; }
-    public string? Reason { get; init; }
-
-    public Result(string operation, Error error, string reason)
-    {
-        Operation = operation;
-        Error = error;
-        Reason = reason;
-    }
+    public string Operation { get; init; } = operation;
+    public Error Error { get; init; } = error;
+    public string? Reason { get; init; } = reason;
 
     public static Result OK(string operation) => new(operation, Error.Success, "OK");
 

@@ -106,7 +106,7 @@ public class SerialPortEmulator : ISerialPort
         public double Flow { get; set; } = flow;
     }
 
-    readonly Random _rnd = new Random((int)DateTime.Now.Ticks);
+    readonly Random _rnd = new((int)DateTime.Now.Ticks);
     readonly Channel[] _channels = Enumerable.Range(0, 14).Select(i => new Channel(i)).ToArray();
 
     string? _response = null;

@@ -71,7 +71,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     public IEnumerable<int> ChannelIDs => _channelControls.Select(c => c.ID);
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public event EventHandler<string>? FlowMeasured;
+    public event EventHandler<double>? FlowMeasured;
 
     public HighLevelController(CommPort port, Channel[] channelControls)
     {
@@ -128,7 +128,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     {
         var channels = _channelControls.Where(ch => ch.IsActive && ch.Flow > 0).ToArray();
 
-        if (!channels.Any())
+        if (channels.Length == 0)
         {
             return;
         }
@@ -223,7 +223,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             _flowReadingThread = null;
             thread.Join();
 
-            FlowMeasured?.Invoke(this, "");
+            FlowMeasured?.Invoke(this, 0);
         }
     }
 
@@ -253,14 +253,10 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     {
         await Task.Delay(50);
         _sniff0.Send(Command.SetChannel(id));
-        //await Task.Delay(50);
-        //_sniff0.Send(Command.SetValve(false));
         await Task.Delay(50);
         _sniff0.Send(Command.SetMotorDirection(direction == Channel.Adjustment.Up));
         await Task.Delay(50);
         _sniff0.Send(Command.RunMotorSteps(ValveMotorAdjustmentSteps));
-        //await Task.Delay(50);
-        //_sniff0.Send(Command.SetValve(true));
     }
 
     // Internal
@@ -299,13 +295,13 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             if (_flowReadingThread != null)
             {
                 var p = data.Split(' ');
-                if (p.Length == 3 && p[0].StartsWith("Flow"))
+                if (p.Length == 3 && p[0].StartsWith("Flow") && double.TryParse(p[2], out double flow))
                 {
-                    FlowMeasured?.Invoke(this, p[2]);
+                    FlowMeasured?.Invoke(this, flow);
 
                     var channel = _channelControls.First(ch => ch.ID == _openedChannelId);
                     if (channel != null )
-                        channel.MeasuredFlow = double.Parse(p[2]);
+                        channel.MeasuredFlow = flow;
                 }
             }
             else if (_isAwaitingResponse)

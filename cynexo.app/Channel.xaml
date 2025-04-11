@@ -9,7 +9,7 @@
              xmlns:local="clr-namespace:Cynexo.App"
              mc:Ignorable="d" 
              d:DesignHeight="28"
-             d:DesignWidth="150"
+             d:DesignWidth="110"
              DataContext="{Binding RelativeSource={RelativeSource Self}}">
     
     <UserControl.Resources>
@@ -65,23 +65,6 @@
                        ContentStringFormat="{} {0:F2}"
                        Visibility="{Binding CanEditFlow, Mode=OneWay, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource true}}"/>
             </Grid>
-            <!--Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="1"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Button Grid.Row="0" 
-                        Style="{StaticResource Arrow}"
-                        Content="⩓"
-                        ToolTip="Increase the flow"
-                        Click="Up_Click"/>
-                <Button Grid.Row="2" 
-                        Style="{StaticResource Arrow}"
-                        Content="⩔"
-                        ToolTip="Decrease the flow"
-                        Click="Down_Click"/>
-            </Grid-->
         </WrapPanel>
     </WrapPanel>
 </UserControl>

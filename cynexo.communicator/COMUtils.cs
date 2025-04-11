@@ -14,19 +14,12 @@ public class COMUtils : IDisposable
     /// <summary>
     /// Port descriptor
     /// </summary>
-    public class Port
+    public class Port(string id, string name, string? description, string? manufacturer)
     {
-        public string ID { get; }
-        public string Name { get; }
-        public string? Description { get; }
-        public string? Manufacturer { get; }
-        public Port(string id, string name, string? description, string? manufacturer)
-        {
-            ID = id;
-            Name = name;
-            Description = description;
-            Manufacturer = manufacturer;
-        }
+        public string ID { get; } = id;
+        public string Name { get; } = name;
+        public string? Description { get; } = description;
+        public string? Manufacturer { get; } = manufacturer;
     }
 
     /// <summary>
@@ -68,9 +61,9 @@ public class COMUtils : IDisposable
         Removed
     }
 
-    readonly List<Port> _cachedPorts = new();
+    readonly List<Port> _cachedPorts = [];
     
-    readonly List<ManagementEventWatcher> _watchers = new();
+    readonly List<ManagementEventWatcher> _watchers = [];
 
     private void Listen(string source, string target, ActionType actionType)
     {
@@ -133,7 +126,7 @@ public class COMUtils : IDisposable
         try
         {
             using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%COM%'");
-            ManagementBaseObject[]? records = searcher.Get().Cast<ManagementBaseObject>().ToArray();
+            var records = searcher.Get().Cast<ManagementBaseObject>();
             ports = records.Select(rec =>
                 {
                     var id = rec["DeviceID"]?.ToString();
@@ -161,7 +154,7 @@ public class COMUtils : IDisposable
             }
         }
 
-        return ports?.ToArray() ?? Array.Empty<Port>();
+        return ports?.ToArray() ?? [];
     }
 
     private static Port? CreateCOMPort(PropertyDataCollection props, string? deviceName = null)
@@ -190,7 +183,7 @@ public class COMUtils : IDisposable
                 usbControllerID = usbControllerID.Replace("\"", "");
                 var devID = usbControllerID.Split('=')[1];
                 using var searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE DeviceID LIKE '%{devID}%'");
-                ManagementBaseObject[] records = searcher.Get().Cast<ManagementBaseObject>().ToArray();
+                var records = searcher.Get().Cast<ManagementBaseObject>();
                 foreach (var rec in records)
                 {
                     var name = (string?)rec.Properties["Name"]?.Value;
