@@ -649,6 +649,16 @@
                            HorizontalAlignment="Center"/>
                     <WrapPanel HorizontalAlignment="Center"
                                Margin="0,8">
+                        <WrapPanel.Resources>
+                            <Style x:Key="ComboBox_PopupScrollableContent" TargetType="StackPanel" BasedOn="{StaticResource ComboBox_PopupScrollableContent}">
+                                <Setter Property="Orientation" Value="Horizontal"/>
+                                <Setter Property="Background" Value="White"/>
+                            </Style>
+                            <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                <Setter Property="Margin" Value="4"/>
+                            </Style>
+                        </WrapPanel.Resources>
+
                         <Label Content="Channel"/>
                         <ComboBox x:Name="cmbChannels"
                                   ItemsSource="{Binding ChannelIDs, Mode=OneWay}"

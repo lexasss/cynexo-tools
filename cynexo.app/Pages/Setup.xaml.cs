@@ -102,7 +102,7 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private async void OnData(object? sender, string data)
     {
-        if (!data.StartsWith("Flow  "))
+        if (!data.StartsWith("Flow: "))
         {
             await Task.Run(() => Dispatcher.Invoke(() =>
             {

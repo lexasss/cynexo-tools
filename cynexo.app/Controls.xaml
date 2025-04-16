@@ -92,6 +92,11 @@
         </Setter>
     </Style>
 
+    <Style x:Key="ComboBox_PopupScrollableContent" TargetType="StackPanel">
+        <Setter Property="IsItemsHost" Value="True"/>
+        <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Contained"/>
+    </Style>
+
     <Style TargetType="{x:Type ComboBox}">
         <Setter Property="OverridesDefaultStyle" Value="true"/>
         <Setter Property="SnapsToDevicePixels" Value="true"/>
@@ -145,8 +150,11 @@
                                         Background="{StaticResource BrushButton}"
                                         BorderThickness="1"
                                         BorderBrush="{StaticResource BrushBorder}"/>
-                                <ScrollViewer Margin="0" SnapsToDevicePixels="True">
-                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                <ScrollViewer Margin="0"
+                                              SnapsToDevicePixels="True">
+                                    <StackPanel Style="{DynamicResource ComboBox_PopupScrollableContent}"
+                                                IsItemsHost="True"
+                                                KeyboardNavigation.DirectionalNavigation="Contained" />
                                 </ScrollViewer>
                             </Grid>
                         </Popup>
