@@ -161,6 +161,14 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     //private void Close_Click(object sender, RoutedEventArgs e) =>
     //    Next?.Invoke(this, Navigation.Exit);
 
+    private void Mode_Checked(object sender, RoutedEventArgs e)
+    {
+        if (!HighLevelController.IsVerbose)
+            HighLevelController.IsVerbose = true;
+    }
+
+    // Low-level UI events
+
     private void SetVerbose_Toggled(object sender, RoutedEventArgs e) =>
         HandleResponse(_sniff0.Send(Command.SetVerbose(tbnSetVerbose.IsChecked == true)));
 
@@ -292,7 +300,9 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
     private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
         btnStartCalibration.IsEnabled = GetCalibChannels().Any(p => p.Use);
 
-    private void HLCalibrate_Click(object sender, RoutedEventArgs e)
+    // High-level UI events
+
+    private void HLAutomaticCalibration_Click(object sender, RoutedEventArgs e)
     {
         HighLevelController.Calibrate();
     }

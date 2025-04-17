@@ -61,8 +61,9 @@
     </ControlTemplate>
 
     <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
-        <Setter Property="SnapsToDevicePixels" Value="true"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Padding" Value="6"/>
         <Setter Property="Foreground" Value="{StaticResource BrushFont}"/>
         <Setter Property="Background" Value="{StaticResource BrushButton}"/>
         <Setter Property="Template">
@@ -71,8 +72,12 @@
                     <Border Name="Border"
                             BorderBrush="{TemplateBinding Background}"
                             Background="{TemplateBinding Background}"
-                            SnapsToDevicePixels="true">
-                        <ContentPresenter Margin="6,4"/>
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                          MinWidth="{TemplateBinding MinWidth}"
+                                          MinHeight="{TemplateBinding MinHeight}"
+                                          Width="{TemplateBinding Width}"
+                                          Height="{TemplateBinding Height}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
@@ -92,9 +97,9 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ComboBox_PopupScrollableContent" TargetType="StackPanel">
-        <Setter Property="IsItemsHost" Value="True"/>
-        <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Contained"/>
+    <Style x:Key="ComboBoxPopupScrollableContent" TargetType="WrapPanel">
+        <Setter Property="Orientation" Value="Vertical"/>
+        <Setter Property="ItemWidth" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ScrollViewer}}, Path=ActualWidth}"/>
     </Style>
 
     <Style TargetType="{x:Type ComboBox}">
@@ -150,11 +155,11 @@
                                         Background="{StaticResource BrushButton}"
                                         BorderThickness="1"
                                         BorderBrush="{StaticResource BrushBorder}"/>
-                                <ScrollViewer Margin="0"
+                                <ScrollViewer Margin="1,0"
                                               SnapsToDevicePixels="True">
-                                    <StackPanel Style="{DynamicResource ComboBox_PopupScrollableContent}"
-                                                IsItemsHost="True"
-                                                KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    <WrapPanel Style="{DynamicResource ComboBoxPopupScrollableContent}"
+                                               IsItemsHost="True"
+                                               KeyboardNavigation.DirectionalNavigation="Contained"/>
                                 </ScrollViewer>
                             </Grid>
                         </Popup>

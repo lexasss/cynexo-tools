@@ -122,15 +122,16 @@
             <CheckBox x:Name="chkMode" Grid.Row="0" Grid.Column="1"
                       Style="{StaticResource Switch}"
                       Margin="8"
-                      Tag="API"
-                      IsChecked="True"
                       Content="High-level"
+                      Tag="API"
+                      IsChecked="False"
                       HorizontalAlignment="Stretch"
-                      HorizontalContentAlignment="Center"/>
+                      HorizontalContentAlignment="Center"
+                      Checked="Mode_Checked"/>
             <TabControl Grid.Row="1" Grid.Column="1"
                         Margin="8,0,0,0"
                         Padding="0,0,4,0"
-                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}, ConverterParameter=True}">
+                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}, ConverterParameter={StaticResource inverted}}">
                 <TabItem Header="General">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -560,16 +561,7 @@
 
             <StackPanel x:Name="stpHighLevel" Grid.Row="1" Grid.Column="1"
                         HorizontalAlignment="Center"
-                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}" Margin="0,6,0,-6">
-
-                <StackPanel DataContext="{Binding HighLevelController}"
-                            Visibility="{Binding IsVerbose, Converter={StaticResource bool2pres}, ConverterParameter={StaticResource inverted}}">
-                    <CheckBox Content="Verbose"
-                          Height="26"
-                          HorizontalAlignment="Center"
-                          ToolTip="Verbose mode must be ON to continue using the high-level functionality"
-                          IsChecked="{Binding IsVerbose, Mode=TwoWay}"/>
-                </StackPanel>
+                        Visibility="{Binding Path=IsChecked, ElementName=chkMode, Converter={StaticResource bool2vis}}">
 
                 <StackPanel DataContext="{Binding HighLevelController}"
                             Visibility="{Binding IsVerbose, Converter={StaticResource bool2pres}}">
@@ -623,7 +615,7 @@
                             <Button Style="{StaticResource Wide}"
                                     IsEnabled="{Binding CanAutoCalibrate}"
                                     Content="Calibrate"
-                                    Click="HLCalibrate_Click"/>
+                                    Click="HLAutomaticCalibration_Click"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -650,12 +642,15 @@
                     <WrapPanel HorizontalAlignment="Center"
                                Margin="0,8">
                         <WrapPanel.Resources>
-                            <Style x:Key="ComboBox_PopupScrollableContent" TargetType="StackPanel" BasedOn="{StaticResource ComboBox_PopupScrollableContent}">
+                            <Style x:Key="ComboBoxPopupScrollableContent" TargetType="WrapPanel" BasedOn="{StaticResource ComboBoxPopupScrollableContent}">
                                 <Setter Property="Orientation" Value="Horizontal"/>
-                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="ItemWidth" Value="{Binding Source={x:Type WrapPanel}, Path=ItemWidth}"/>
+                                <Setter Property="MaxWidth" Value="190"/>
                             </Style>
                             <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
-                                <Setter Property="Margin" Value="4"/>
+                                <Setter Property="Padding" Value="12"/>
+                                <Setter Property="Margin" Value="1"/>
                             </Style>
                         </WrapPanel.Resources>
 
