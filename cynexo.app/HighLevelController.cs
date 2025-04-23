@@ -73,7 +73,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler<double>? FlowMeasured;
 
-    public HighLevelController(CommPort port, Channel[] channelControls)
+    public HighLevelController(CommPort port, Widgets.Channel[] channelControls)
     {
         _sniff0 = port;
         _channelControls = channelControls;
@@ -91,7 +91,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
 
                 if (!IsCalibrationMode)
                 {
-                    var channel = (Channel)s!;
+                    var channel = (Widgets.Channel)s!;
                     channel.ToggleFlowState();
 
                     await Task.Delay(100);
@@ -103,7 +103,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
             };
             channelControl.AdjustmentRequested += (s, e) =>
             {
-                if (s is Channel ch)
+                if (s is Widgets.Channel ch)
                 {
                     AdjustChannel(ch.ID, e);
                 }
@@ -249,12 +249,12 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
         IsBusy = false;
     }
 
-    public async void AdjustChannel(int id, Channel.Adjustment direction)
+    public async void AdjustChannel(int id, ChannelFlowAdjustment direction)
     {
         await Task.Delay(50);
         _sniff0.Send(Command.SetChannel(id));
         await Task.Delay(50);
-        _sniff0.Send(Command.SetMotorDirection(direction == Channel.Adjustment.Up));
+        _sniff0.Send(Command.SetMotorDirection(direction == ChannelFlowAdjustment.Up));
         await Task.Delay(50);
         _sniff0.Send(Command.RunMotorSteps(ValveMotorAdjustmentSteps));
     }
@@ -281,7 +281,7 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
     };
 
     readonly CommPort _sniff0;
-    readonly Channel[] _channelControls;
+    readonly Widgets.Channel[] _channelControls;
 
     bool _isAwaitingResponse = false;
     Response _receivedResponse = new();

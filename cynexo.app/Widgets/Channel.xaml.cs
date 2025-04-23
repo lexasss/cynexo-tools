@@ -2,24 +2,10 @@
 using System.ComponentModel;
 using System.Windows.Controls;
 
-namespace Cynexo.App;
-
-public enum ChannelOperationState
-{
-    Initial,
-    Calibrating,
-    Calibrated,
-    Flowing
-}
+namespace Cynexo.App.Widgets;
 
 public partial class Channel : UserControl, INotifyPropertyChanged
 {
-    public enum Adjustment
-    {
-        Up,
-        Down
-    }
-
     public int ID
     {
         get => field;
@@ -83,7 +69,7 @@ public partial class Channel : UserControl, INotifyPropertyChanged
 
 
     public event EventHandler<bool>? ActivityChanged;
-    public event EventHandler<Adjustment>? AdjustmentRequested;
+    public event EventHandler<ChannelFlowAdjustment>? AdjustmentRequested;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -119,11 +105,11 @@ public partial class Channel : UserControl, INotifyPropertyChanged
 
     private void Up_Click(object sender, System.Windows.RoutedEventArgs e)
     {
-        AdjustmentRequested?.Invoke(this, Adjustment.Up);
+        AdjustmentRequested?.Invoke(this, ChannelFlowAdjustment.Up);
     }
 
     private void Down_Click(object sender, System.Windows.RoutedEventArgs e)
     {
-        AdjustmentRequested?.Invoke(this, Adjustment.Down);
+        AdjustmentRequested?.Invoke(this, ChannelFlowAdjustment.Down);
     }
 }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Cynexo.App.Channel"
+﻿<UserControl x:Class="Cynexo.App.Widgets.Channel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,6 @@
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:Cynexo.App.Utils" 
-             xmlns:local="clr-namespace:Cynexo.App"
              mc:Ignorable="d" 
              d:DesignHeight="28"
              d:DesignWidth="110"

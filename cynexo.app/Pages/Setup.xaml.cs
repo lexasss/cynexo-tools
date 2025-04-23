@@ -11,24 +11,12 @@ namespace Cynexo.App.Pages;
 
 public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 {
-    public HighLevelController HighLevelController { get; }
-
     public event EventHandler<Navigation>? Next;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public Setup()
     {
         InitializeComponent();
-
-        HighLevelController = new HighLevelController(_sniff0, GetHighLevelChannels());
-        HighLevelController.FlowMeasured += (s, e) => Dispatcher.Invoke(() => lblFlow.Content = $"{e:F2}");
-
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HighLevelController)));
-
-        App.Current.Exit += (s, e) =>
-        {
-            HighLevelController.Dispose();
-        };
     }
 
     // Internal
@@ -37,30 +25,6 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     readonly Storage _storage = Storage.Instance;
     readonly CommPort _sniff0 = CommPort.Instance;
-
-    private Channel[] GetHighLevelChannels()
-    {
-        var result = new List<Channel>();
-
-        void AddFrom(UIElementCollection elements)
-        {
-            foreach (UIElement el in elements)
-            {
-                if (el is Channel channel)
-                {
-                    result.Add(channel);
-                }
-                else if (el is Panel panel)
-                {
-                    AddFrom(panel.Children);
-                }
-            }
-        }
-
-        AddFrom(wplChannels.Children);
-
-        return result.ToArray();
-    }
 
     private ChannelCalibration[] GetCalibChannels()
     {
@@ -163,8 +127,8 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private void Mode_Checked(object sender, RoutedEventArgs e)
     {
-        if (!HighLevelController.IsVerbose)
-            HighLevelController.IsVerbose = true;
+        if (!wdgHighLevel.HighLevelController.IsVerbose)
+            wdgHighLevel.HighLevelController.IsVerbose = true;
     }
 
     // Low-level UI events
@@ -299,29 +263,4 @@ public partial class Setup : Page, IPage<Navigation>, INotifyPropertyChanged
 
     private void CalibChannel_Toggled(object sender, RoutedEventArgs e) =>
         btnStartCalibration.IsEnabled = GetCalibChannels().Any(p => p.Use);
-
-    // High-level UI events
-
-    private void HLAutomaticCalibration_Click(object sender, RoutedEventArgs e)
-    {
-        HighLevelController.Calibrate();
-    }
-
-    private void HLManualCalibration_Click(object sender, RoutedEventArgs e)
-    {
-        HighLevelController.ToggleFlow((int)cmbChannels.SelectedItem);
-        HighLevelController.ToggleFlowMeasurements();
-
-        btnManualCalibration.Content = HighLevelController.IsManualCalibrationActive ? "Close" : "Open";
-    }
-
-    private void HLIncreaseFlow_Click(object sender, RoutedEventArgs e)
-    {
-        HighLevelController.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Up);
-    }
-
-    private void HLDecreaseFlow_Click(object sender, RoutedEventArgs e)
-    {
-        HighLevelController.AdjustChannel((int)cmbChannels.SelectedItem, Channel.Adjustment.Down);
-    }
 }
