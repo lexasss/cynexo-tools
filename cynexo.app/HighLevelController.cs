@@ -101,13 +101,6 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
                     _sniff0.Send(Command.SetValve(channel.IsOpen));
                 }
             };
-            channelControl.AdjustmentRequested += (s, e) =>
-            {
-                if (s is Widgets.Channel ch)
-                {
-                    AdjustChannel(ch.ID, e);
-                }
-            };
         }
 
         _sniff0.Data += OnData;
@@ -299,8 +292,8 @@ public class HighLevelController : IDisposable, INotifyPropertyChanged
                 {
                     FlowMeasured?.Invoke(this, flow);
 
-                    var channel = _channelControls.First(ch => ch.ID == _openedChannelId);
-                    if (channel != null )
+                    var channel = _channelControls.FirstOrDefault(ch => ch.ID == _openedChannelId);
+                    if (channel != null)
                         channel.MeasuredFlow = flow;
                 }
             }

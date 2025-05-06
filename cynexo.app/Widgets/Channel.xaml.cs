@@ -69,7 +69,6 @@ public partial class Channel : UserControl, INotifyPropertyChanged
 
 
     public event EventHandler<bool>? ActivityChanged;
-    public event EventHandler<ChannelFlowAdjustment>? AdjustmentRequested;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -102,14 +101,4 @@ public partial class Channel : UserControl, INotifyPropertyChanged
     // Internal
 
     ChannelOperationState _state = ChannelOperationState.Initial;
-
-    private void Up_Click(object sender, System.Windows.RoutedEventArgs e)
-    {
-        AdjustmentRequested?.Invoke(this, ChannelFlowAdjustment.Up);
-    }
-
-    private void Down_Click(object sender, System.Windows.RoutedEventArgs e)
-    {
-        AdjustmentRequested?.Invoke(this, ChannelFlowAdjustment.Down);
-    }
 }
